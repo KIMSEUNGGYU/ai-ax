@@ -1,0 +1,20 @@
+{
+  "name": "claude-plugins",
+  "owner": {
+    "name": "team-attention"
+  },
+  "plugins": [
+    {
+      "name": "fe-toolkit",
+      "source": "./fe-toolkit",
+      "description": "프론트엔드 개발용 도구 모음",
+      "version": "0.1.0"
+    },
+    {
+      "name": "hiring-toolkit",
+      "source": "./hiring-toolkit",
+      "description": "프론트엔드 개발자 과제 전형용 도구",
+      "version": "0.1.0"
+    }
+  ]
+}

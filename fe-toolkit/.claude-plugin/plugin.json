@@ -1,6 +1,6 @@
 {
   "name": "fe-toolkit",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "프론트엔드 개발용 도구 모음 - 코드 리뷰, 개발 프로세스, 리팩토링 분석, FE 원칙",
   "author": {
     "name": "gyu"
