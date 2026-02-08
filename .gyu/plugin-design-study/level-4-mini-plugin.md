@@ -223,3 +223,147 @@ Jupyter Notebook(.ipynb) 셀 편집 도구. FE 작업에서는 거의 안 씀.
 코드 리뷰어가 노트북까지 수정하면 안 되니까 함께 차단.
 
 ---
+
+## 5. Hook — hooks/hooks.json + scripts/review-reminder.mjs
+
+두 파일이 한 세트. hooks.json이 이벤트 매핑, mjs가 실제 로직.
+
+### hooks.json — 이벤트-스크립트 매핑
+
+```json
+{
+  "hooks": {
+    "PreToolUse": [{
+      "matcher": "*",
+      "hooks": [{
+        "type": "command",
+        "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/review-reminder.mjs\"",
+        "timeout": 3
+      }]
+    }]
+  }
+}
+```
+
+| 필드 | 의미 |
+|------|------|
+| `PreToolUse` | 언제 — 도구 실행 직전마다 |
+| `matcher: "*"` | 어떤 도구 — 모든 도구 (와일드카드) |
+| `command` | 뭘 실행 — Node.js 스크립트 |
+| `${CLAUDE_PLUGIN_ROOT}` | 플러그인 루트 경로 자동 치환 |
+| `timeout: 3` | 3초 안에 완료되어야 함 |
+
+### `CLAUDE_PLUGIN_ROOT`는 뭘 가리키나?
+
+**전역/프로젝트/로컬이 아닌, 그 플러그인 폴더 자체.**
+
+```
+mini-review/                    ← 이 플러그인에서 CLAUDE_PLUGIN_ROOT = 여기
+├── .claude-plugin/plugin.json
+└── scripts/review-reminder.mjs
+
+fe-toolkit/                     ← 이 플러그인에서 CLAUDE_PLUGIN_ROOT = 여기
+└── scripts/...
+```
+
+plugin.json 위치 기준으로 Claude Code가 자동 설정. 플러그인마다 다른 값.
+
+### review-reminder.mjs — 실제 로직
+
+```javascript
+// 1. stdin으로 이벤트 데이터 수신
+const input = await readStdin();  // { toolName: "Read", toolInput: {...} }
+
+// 2. 도구별 맞춤 리마인더
+const reminders = {
+  Read: '변경 영향도를 함께 파악하라.',
+  Task: 'Agent에게 충분한 컨텍스트를 전달하라.',
+  Grep: '변경된 함수가 다른 곳에서 사용되는지 확인하라.',
+};
+
+// 3. stdout으로 약속된 JSON 형식 반환
+{ "continue": true, "hookSpecificOutput": { "additionalContext": "메시지" } }
+```
+
+### stdout JSON 형식이 중요한 이유
+
+일반 `console.log("메시지")` → 무시됨 ❌
+약속된 JSON 형식 → Claude Code가 파싱 → `additionalContext`를 Claude 컨텍스트에 주입 ✅
+
+```
+continue: true   → 도구 실행 허용 (false면 차단)
+additionalContext → Claude의 바로 다음 컨텍스트에 삽입 (프롬프트처럼 동작)
+```
+
+### 도구 이름(toolName) 목록
+
+stdin의 `toolName`은 Claude Code 내장 도구 중 하나:
+
+| 도구명 | 역할 |
+|--------|------|
+| Read | 파일 읽기 |
+| Write | 파일 생성 |
+| Edit | 파일 수정 |
+| Bash | 터미널 명령 실행 |
+| Glob | 파일 패턴 검색 |
+| Grep | 파일 내용 검색 |
+| Task | 서브 에이전트 생성 |
+| WebFetch | URL 내용 가져오기 |
+| WebSearch | 웹 검색 |
+| NotebookEdit | Jupyter 노트북 편집 |
+
+### 전체 흐름
+
+```
+Claude가 Read를 쓰려 함
+  → PreToolUse 이벤트
+  → hooks.json → review-reminder.mjs 실행
+  → stdin: { toolName: "Read", ... }
+  → 스크립트: reminders["Read"] 매칭
+  → stdout: { continue: true, additionalContext: "변경 영향도를 함께 파악하라." }
+  → Claude 컨텍스트에 주입
+  → Read 실행
+```
+
+매칭되지 않는 도구에는 `{ continue: true }`만 반환 (리마인더 없음).
+
+---
+
+## 요약: 4컴포넌트 동작 흐름
+
+```
+사용자: "/mini-review:review src/login.tsx"
+  │
+  ▼
+[Skill] review-criteria 자동 로드 → 리뷰 기준이 컨텍스트에 주입
+  │
+  ▼
+[Command] review.md 로드 → 3단계 워크플로우 대본
+  │
+  ├─ Phase 1: 메인 Claude가 직접 diff 수집
+  │
+  ├─ Phase 2: Task(plugin:mini-review:code-reviewer) 호출
+  │     │
+  │     ├─ [Hook] PreToolUse → "Agent에게 충분한 컨텍스트를 전달하라"
+  │     │
+  │     └─ [Agent] code-reviewer 독립 인스턴스 생성
+  │           ├ model: sonnet
+  │           ├ disallowedTools: Write, Edit, Bash, NotebookEdit
+  │           └ 리뷰 수행 → 결과 반환
+  │
+  └─ Phase 3: 결과 사용자에게 전달
+```
+
+## 핵심 배운 것
+
+| 컴포넌트 | 핵심 한 줄 |
+|----------|-----------|
+| plugin.json | `.claude-plugin/plugin.json` 있어야 플러그인 인식. name이 호출 접두사 |
+| Skill | description이 자동 트리거. 본문은 What(기준)만 |
+| Command | `/명령`으로 직접 호출. 본문은 How(절차). `{{ARGUMENTS}}`로 입력 참조 |
+| Agent | `disallowedTools`로 물리적 역할 제한. `model`로 비용/품질 조절 |
+| Hook | stdin JSON → 스크립트 → stdout JSON. `additionalContext`로 매번 리마인더 주입 |
+
+---
+
+> 다음: 개편 방향 설계 또는 Level 5 진행

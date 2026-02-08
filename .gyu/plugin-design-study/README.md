@@ -71,8 +71,8 @@ Phase 3: 범용화 (후순위, 방향 미정) ───────────�
 - [x] OMC 구조 분석 (`plugin-design-study.md`)
 - [x] Level 1: 전체 그림
 - [x] Level 2: 플러그인 컴포넌트 상세
-- [~] Level 3: OMC 코드 심층 분석 (이해중)
-- [ ] Level 4: 미니 플러그인 실습
+- [x] Level 3: OMC 코드 심층 분석
+- [x] Level 4: 미니 플러그인 실습 (`mini-review/` 생성 + 문서화)
 
 ### Phase 2: 나만의 시스템 구축
 - [ ] Level 5: fe-workflow 플러그인 (컨벤션 + OMC 패턴)
