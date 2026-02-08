@@ -58,27 +58,22 @@ FE 개발 워크플로우를 하나의 플러그인으로 통합 관리.
 
 ---
 
-## 결정 사항
+## 설계 철학
 
-- 플러그인명: `fe-workflow`
-- 위치: 로컬 개발 → GitHub 마켓플레이스
-- 레거시: 플러그인 완성 후 삭제
-- 설계 철학: **ECC (설정 지향, 품질 중심, 개발자 주도)** + OMC 구조 패턴 차용
-
-### 설계 원칙 (ECC vs OMC 분석 기반)
+**ECC (설정 지향, 품질 중심, 개발자 주도)** + OMC 구조 패턴 차용
 
 | 원칙 | 선택 | 이유 |
 |------|------|------|
 | MD 기반 규칙/컨벤션 | ECC | conventions/가 Skill의 소스 |
-| 명시적 워크플로우 | ECC | `/architecture → 구현 → /review → /recap` |
+| 명시적 워크플로우 | ECC | `/architecture → 구현 → /review → /save` |
 | 4컴포넌트 구조 | OMC 차용 | Skill/Command/Agent/Hook 구조는 효과적 |
 | 역할 제한 (disallowedTools) | OMC 차용 | review 에이전트 읽기 전용 등 |
 | FE 전문 소수 에이전트 | ECC | 5~8개면 충분, 범용 35개 불필요 |
-| 자연어 매직 (keyword-detector) | 불필요 | 명시적 `/command`로 충분 |
-| 복잡한 상태 관리 (.omc/state/) | 불필요 | 단순 워크플로우에 과도 |
+| 복잡한 상태 관리 | 불필요 | /save 시점에 Claude가 분석 (매 도구 호출 기록은 과도) |
 | Agent Teams (TeammateTool) | v0.5+ 검토 | 현재 규모에 과도. conventions 10개+ 확장 시 재검토 |
 
 > 상세 분석: `.gyu/plugin-design-study/README.md` 하단 참조
+> 세션별 세부 결정: `.ai/DECISIONS.md` 참조
 
 ---
 

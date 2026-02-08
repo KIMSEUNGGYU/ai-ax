@@ -13,15 +13,17 @@
 ```
 ai-ax/
 ├── .claude-plugin/
-│   └── marketplace.json           ← 마켓플레이스 등록 (fe-workflow만)
+│   └── marketplace.json           ← 마켓플레이스 등록
 ├── .gyu/                          ← 사용자 소유 (수정 시 확인 필수)
 │   ├── plugin-design-study/       ← CC 플러그인 학습 (OMC/ECC 분석)
-│   ├── plugin-design/             ← fe-workflow 설계 마스터
+│   ├── plugin-design/             ← 설계 마스터 (로드맵 + 큰 그림)
 │   └── everything-cc/             ← ECC 구조 분석
 │
 ├── .ai/                           ← Claude 소유 (자유롭게 업데이트)
 │   ├── STATUS.md                  ← 현재 작업 상태 (덮어쓰기)
-│   └── DECISIONS.md               ← 결정 기록 (누적)
+│   ├── DECISIONS.md               ← 세션별 세부 결정 (누적, "왜 그렇게 했나")
+│   ├── notes/                     ← /note 산출물
+│   └── logs/                      ← 세션 로그 + 습관 점수
 │
 ├── fe-workflow/                   ← FE 워크플로우 v0.4 (Skill x1, Command x4, Agent x2, Convention x4)
 ├── session-manager/               ← 세션 상태 관리 v0.1 (Command x3, Hook x1)
