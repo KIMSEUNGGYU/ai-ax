@@ -31,23 +31,24 @@ FE 개발 워크플로우를 하나의 플러그인으로 통합 관리.
 - [x] api-layer.md (구 api-type-layer.md)
 - [~] error-handling.md — 톤 정리 추후
 
-### Step 2: 플러그인 컴포넌트 설계 ← 현재 (v0.3)
+### Step 2: 플러그인 컴포넌트 설계 ✅
 > 정리된 컨벤션을 기반으로 플러그인 구성 요소 확정
 
 - [x] Skills 상세 설계 — fe-principles (auto-load)
 - [x] /review Level 4 재설계 완료 (v0.2)
-- [x] v0.3 전체 워크플로우 설계 (아래 참조)
-- [ ] architect.md 에이전트 구현
-- [ ] /architecture Level 4 재설계 + 산출물 저장
-- [ ] /pr command 신규 구현
-- [ ] 로그/상태 관리 구조 구현 (v0.4+)
+- [x] v0.3 전체 워크플로우 설계
+- [x] architect.md 에이전트 구현 (v0.3)
+- [x] /architecture Level 4 재설계 + 산출물 저장 (v0.3)
+- [x] /pr command 신규 구현 (v0.3)
+- [x] 로그/상태 관리 → session-manager 분리 (v0.4)
 
 ### Step 3: 플러그인 구현 + 테스트
 > 로컬에서 플러그인 테스트
 
-- [ ] 플러그인 로드 테스트 (`claude --plugin-dir ./fe-workflow`)
-- [ ] 각 command 호출 테스트
-- [ ] 검증 및 피드백 반영
+- [x] fe-workflow 로드 테스트 (v0.3)
+- [x] session-manager 구현 (v0.4)
+- [ ] session-manager 로드 테스트
+- [ ] session-wrap(외부) 설치 + 연동 검증
 
 ### Step 4: 마이그레이션
 > 기존 레거시 대체
@@ -117,8 +118,7 @@ fe-workflow/
 │   ├── architecture.md           ← Level 4 재설계 (오케스트레이터→agent 위임)
 │   ├── review.md                 ← 현행 유지 (v0.2 완성)
 │   ├── pr.md                     ← 신규
-│   ├── recap.md                  ← 현행 유지 (보조)
-│   └── organization.md           ← 현행 유지 (보조)
+│   │   (recap, organization → session-manager로 분리, v0.4)
 ├── agents/
 │   ├── architect.md              ← 신규 (설계 전문, Read only)
 │   └── code-reviewer.md          ← 현행 유지
@@ -149,16 +149,18 @@ fe-workflow/
 | 버전 | 범위 | 핵심 |
 |---|---|---|
 | **v0.2** ✅ | /review Level 4, commands 마이그레이션 | 오케스트레이터+에이전트 패턴 확립 |
-| **v0.3** | 전체 워크플로우 구현 | architect agent, /architecture 재설계, /pr 신규 |
-| **v0.4** | 로그/상태 관리 | Command 실행 로그, 리뷰 점수 추적, Hook 자동화 |
+| **v0.3** ✅ | 전체 워크플로우 구현 | architect agent, /architecture 재설계, /pr 신규 |
+| **v0.4** ✅ | 세션 관리 분리 + 로그/점수 | session-manager 독립, session-wrap 외부 연동 |
 | **v0.5** | Agent Teams 검토 | 멀티 리뷰어, 병렬 설계 탐색 (규모 확장 시) |
 
-#### v0.4 — 로그/상태 관리
+#### v0.4 ✅ — 세션 관리 분리 + 로그/점수
 
-- 각 Command 실행 시 로그 자동 기록
-- 기록 내용: timestamp, command명, 입력 요약, 산출물 경로, (리뷰 시) 점수
-- Hook(PostToolUse)으로 자동화 검토
-- 용도: 워크플로우 어느 단계에서 문제가 발생했는지 추적 → 개선 포인트 파악
+- recap/organization을 fe-workflow에서 분리 → **session-manager** 독립 플러그인
+- 커맨드: `/save` (상태 저장 + 로그 + 점수), `/dashboard` (습관 대시보드), `/note` (학습 기록)
+- SessionStart hook으로 STATUS.md 자동 로드
+- AI 협업 점수 /10 체계 (6항목)
+- 세션 분석/제안은 **session-wrap**(외부 플러그인)에 위임
+- 상세: `v0.4-diagram.md`
 
 #### v0.5 — Agent Teams 검토
 
@@ -172,3 +174,4 @@ fe-workflow/
 
 - 2025-02-05: Step 1 시작 - API/타입 계층 컨벤션 정리 완료
 - 2026-02-08: v0.3 전체 워크플로우 설계 완료
+- 2026-02-09: v0.4 완료 - session-manager 분리, session-wrap 외부 연동
