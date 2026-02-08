@@ -11,7 +11,9 @@ import { randomBytes } from 'node:crypto';
 
 const projectRoot = process.cwd();
 const statusPath = join(projectRoot, '.ai', 'STATUS.md');
-const sessionId = `${new Date().toISOString().slice(0, 10)}_${randomBytes(2).toString('hex')}`;
+const today = new Date();
+const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+const sessionId = `${dateStr}_${randomBytes(2).toString('hex')}`;
 
 let statusContent = '';
 try {
