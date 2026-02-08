@@ -11,14 +11,29 @@ argument-hint: <정리할 주제>
 - $ARGUMENTS: 정리할 주제 (예: "React Suspense 패턴", "커서 페이지네이션 구현")
 - 대화 컨텍스트에서 논의한 내용
 
+## 카테고리
+
+내용에 따라 적절한 카테고리를 판단해서 태그한다:
+
+| 카테고리 | 언제 | 예시 |
+|----------|------|------|
+| `discovery` | 새로운 API, 라이브러리, 패턴 발견 | React Suspense, Tanstack Router |
+| `problem-solving` | 문제 해결 과정 (성공/실패 모두) | CORS 이슈 디버깅, 번들 사이즈 최적화 |
+| `domain` | 비즈니스 로직, 시스템 제약 이해 | 결제 플로우, 권한 체계 |
+| `process` | 워크플로우/도구 활용 개선 | Git 전략, CI/CD 설정 |
+| `mistake` | 실수, 오해, 삽질에서 배운 것 | 잘못된 캐시 전략, 타입 설계 실수 |
+
+**실패도 학습이다** — mistake 카테고리를 적극 활용. 삽질 과정과 원인을 기록하면 같은 실수를 반복하지 않는다.
+
 ## 수행
 
 1. $ARGUMENTS가 없으면 → 대화 컨텍스트에서 정리할 주제 파악, 모호하면 질문
-2. 기존 노트 확인: `.ai/notes/` 에 같은 주제 파일이 있는지 Glob으로 탐색
-   - 있으면 → 기존 파일에 내용 추가/업데이트
+2. 카테고리 자동 판단 (대화 컨텍스트 기반)
+3. 기존 노트 확인: `.ai/notes/` 에 같은 주제 파일이 있는지 Glob으로 탐색
+   - 있으면 → 기존 내용을 Read로 읽고, 겹치는 내용은 병합/보강
    - 없으면 → 새 파일 생성
-3. 대화 컨텍스트 + 필요시 코드 참조해서 정리
-4. `.ai/notes/{주제}.md` 로 저장
+4. 대화 컨텍스트 + 필요시 코드 참조해서 정리
+5. `.ai/notes/{주제}.md` 로 저장
 
 ## 파일명 규칙
 - kebab-case (예: `react-suspense.md`, `cursor-pagination.md`)
@@ -27,6 +42,10 @@ argument-hint: <정리할 주제>
 ## 출력 형식
 
 ```markdown
+---
+category: {discovery | problem-solving | domain | process | mistake}
+---
+
 # {주제}
 
 > 한 줄 요약
