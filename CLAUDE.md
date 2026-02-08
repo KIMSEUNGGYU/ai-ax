@@ -23,7 +23,8 @@ ai-ax/
 │   ├── STATUS.md                  ← 현재 작업 상태 (덮어쓰기)
 │   └── DECISIONS.md               ← 결정 기록 (누적)
 │
-├── fe-workflow/                   ← 메인 플러그인 v0.3 (Skill x1, Command x6, Agent x2, Convention x4)
+├── fe-workflow/                   ← FE 워크플로우 v0.4 (Skill x1, Command x4, Agent x2, Convention x4)
+├── session-manager/               ← 세션 상태 관리 v0.1 (Command x3, Hook x1)
 ├── mini-review/                   ← 학습용 미니 플러그인 (마켓플레이스 미등록)
 └── CLAUDE.md                      ← 이 파일
 ```
@@ -33,16 +34,17 @@ ai-ax/
 | 트랙 | 마스터 문서 | 상태 |
 |------|-------------|------|
 | 학습 | `.gyu/plugin-design-study/README.md` | Level 1~4 완료 |
-| 빌드 | `.gyu/plugin-design/plugin-design.md` | v0.3 완료, v0.4 진행 중 |
+| 빌드 | `.gyu/plugin-design/plugin-design.md` | v0.4 완료 (session-manager 분리) |
 
 ## 세션 시작 시
 
-1. `.ai/STATUS.md` 읽기 → 현재 작업 상태 파악
-2. 이전 작업 이어갈지 사용자에게 확인
+SessionStart hook이 자동으로 STATUS.md를 로드한다.
+수동이 필요하면: `.ai/STATUS.md` 읽기 → 이전 작업 이어갈지 확인.
 
 ## 세션 종료 시
 
-`.ai/STATUS.md` + `.ai/DECISIONS.md` 업데이트
+1. `/wrap` → 세션 분석/제안 (session-wrap 외부 플러그인)
+2. `/save` → 상태 저장 + 로그 + 점수 (session-manager)
 
 ## 설계 철학
 

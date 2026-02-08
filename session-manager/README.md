@@ -1,6 +1,8 @@
 # session-manager
 
-세션 관리 플러그인 — 활동 로깅, 코딩 습관 분석, 상태 저장.
+세션 상태 관리 + 습관 측정 플러그인.
+
+> 세션 종료 분석/제안은 [session-wrap](https://github.com/team-attention/plugins-for-claude-natives/tree/main/plugins/session-wrap) 플러그인 사용 추천.
 
 ## 설치
 
@@ -17,21 +19,21 @@ claude --plugin-dir /path/to/session-manager
 
 | 커맨드 | 역할 |
 |--------|------|
-| `/wrap` | 세션 마무리 — 상태 저장 + 활동 로그 + 습관 점수 |
+| `/save` | 세션 상태 저장 — STATUS.md + 활동 로그 + 습관 점수 |
 | `/dashboard` | 습관 대시보드 — 점수 추이, 강점/약점, 개선 포인트 |
 | `/note` | 개발 중 패턴/개념 정리 → `.ai/notes/`에 md 저장 |
 
 ## 워크플로우
 
 ```
-세션 종료          →  /wrap         →  STATUS.md + 로그 + 점수
+세션 종료          →  /save         →  STATUS.md + 로그 + 점수
        ↓
 다음 세션 시작     →  (자동)        →  STATUS.md 로드 + 세션 ID 생성
        ↓
 습관 확인          →  /dashboard    →  점수 추이 + 개선 포인트
 ```
 
-## /wrap 3 Phase
+## /save 3 Phase
 
 1. **상태 저장**: `.ai/STATUS.md` 덮어쓰기 + `.ai/DECISIONS.md` 누적
 2. **세션 로그**: `.ai/logs/sessions/{YYYY-MM-DD}_{id}.md` 생성
@@ -54,6 +56,7 @@ claude --plugin-dir /path/to/session-manager
 .ai/
 ├── STATUS.md              ← 현재 작업 상태 (덮어쓰기)
 ├── DECISIONS.md           ← 결정 기록 (누적)
+├── notes/                 ← /note 산출물
 └── logs/
     ├── habit-score.md     ← 습관 점수 누적 테이블
     └── sessions/
@@ -71,7 +74,7 @@ session-manager/
 ├── .claude-plugin/
 │   └── plugin.json
 ├── commands/
-│   ├── wrap.md
+│   ├── save.md
 │   ├── dashboard.md
 │   └── note.md
 ├── hooks/
