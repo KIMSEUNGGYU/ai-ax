@@ -34,6 +34,8 @@ claude --plugin-dir ./fe-workflow --plugin-dir ./session-manager
     ↓
 /pr                                              ← fe-workflow
     ↓
+/note 주제명                                     ← session-manager (개발 중 아무 때나)
+    ↓
 /wrap                                            ← session-manager (세션 마무리)
 ```
 
@@ -56,3 +58,4 @@ claude --plugin-dir ./fe-workflow --plugin-dir ./session-manager
 |--------|------|
 | `/wrap` | 세션 마무리 — 상태 저장 + 로그 + 습관 점수 |
 | `/dashboard` | 습관 대시보드 — 점수 추이, 개선 포인트 |
+| `/note` | 개발 중 패턴/개념 정리 → md 저장 |

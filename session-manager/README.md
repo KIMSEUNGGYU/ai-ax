@@ -19,6 +19,7 @@ claude --plugin-dir /path/to/session-manager
 |--------|------|
 | `/wrap` | 세션 마무리 — 상태 저장 + 활동 로그 + 습관 점수 |
 | `/dashboard` | 습관 대시보드 — 점수 추이, 강점/약점, 개선 포인트 |
+| `/note` | 개발 중 패턴/개념 정리 → `.ai/notes/`에 md 저장 |
 
 ## 워크플로우
 
@@ -71,7 +72,8 @@ session-manager/
 │   └── plugin.json
 ├── commands/
 │   ├── wrap.md
-│   └── dashboard.md
+│   ├── dashboard.md
+│   └── note.md
 ├── hooks/
 │   └── hooks.json
 ├── scripts/
