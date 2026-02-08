@@ -1,0 +1,5 @@
+{
+  "name": "fe-workflow",
+  "description": "프론트엔드 개발 워크플로우 플러그인 — 컨벤션, 코드 리뷰, 설계 자동화",
+  "version": "0.1.0"
+}
