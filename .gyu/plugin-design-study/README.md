@@ -63,6 +63,7 @@ Phase 3: 범용화 (후순위, 방향 미정) ───────────�
 | `level-4-mini-plugin.md` | Level 4: 미니 플러그인 실습 기록 |
 | `level-5-fe-workflow.md` | Level 5: fe-workflow 플러그인 설계/구현 |
 | `level-6-generic-agent.md` | Level 6: 범용 에이전트 (후순위) |
+| `claude-code-2026-updates.md` | Opus 4.6 + Agent Teams 최신 업데이트 |
 
 ## 진행 상태
 

@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "이 프로젝트의 .ai/STATUS.md 자동 업데이트 판단.\n\n다음 경우에만 {\"ok\": false}로 응답:\n- 이번 대화에서 실질적 작업 진행이 있었고 (코드 변경, 설계 결정, 파일 생성/수정 등)\n- .ai/STATUS.md에 아직 반영되지 않았을 때\n\n다음 경우 {\"ok\": true}로 응답:\n- 단순 질문/답변, 탐색, 읽기만 한 경우\n- 이미 STATUS.md가 최신 상태인 경우\n- stop_hook_active가 true인 경우 (이미 업데이트 시도 완료)\n\n{\"ok\": false} 시 reason에 업데이트할 내용을 구체적으로 적어라.",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}
