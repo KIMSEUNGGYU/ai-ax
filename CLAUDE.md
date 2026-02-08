@@ -16,12 +16,12 @@ ai-ax/
 │   └── marketplace.json           ← 마켓플레이스 등록
 ├── .gyu/                          ← 사용자 소유 (수정 시 확인 필수)
 │   ├── plugin-design-study/       ← CC 플러그인 학습 (OMC/ECC 분석)
-│   ├── plugin-design/             ← 설계 마스터 (로드맵 + 큰 그림)
+│   ├── plugin-design/             ← 다이어그램 + 아카이브
 │   └── everything-cc/             ← ECC 구조 분석
 │
 ├── .ai/                           ← Claude 소유 (자유롭게 업데이트)
-│   ├── STATUS.md                  ← 현재 작업 상태 (덮어쓰기)
-│   ├── DECISIONS.md               ← 세션별 세부 결정 (누적, "왜 그렇게 했나")
+│   ├── STATUS.md                  ← 상태 + 로드맵 (/save 관리)
+│   ├── DECISIONS.md               ← 세션별 결정 누적 (/save 관리)
 │   ├── notes/                     ← /note 산출물
 │   └── logs/                      ← 세션 로그 + 습관 점수
 │
@@ -31,12 +31,11 @@ ai-ax/
 └── CLAUDE.md                      ← 이 파일
 ```
 
-## 작업 트랙
+## 작업 상태 관리
 
-| 트랙 | 마스터 문서 | 상태 |
-|------|-------------|------|
-| 학습 | `.gyu/plugin-design-study/README.md` | Level 1~4 완료 |
-| 빌드 | `.gyu/plugin-design/plugin-design.md` | v0.4 완료 (session-manager 분리) |
+- **현재 상태 + 로드맵**: `.ai/STATUS.md` (/save가 자동 관리)
+- **결정 기록**: `.ai/DECISIONS.md` (/save가 자동 누적)
+- 학습 참고: `.gyu/plugin-design-study/README.md`
 
 ## 세션 시작 시
 
