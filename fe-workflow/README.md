@@ -3,6 +3,8 @@
 FE 컨벤션 기반 개발 워크플로우 플러그인.
 설계 → 개발 → 리뷰 → PR 전 과정을 커맨드로 자동화.
 
+> 세션 관리(/recap, /organization, /habit)는 v0.4에서 [session-manager](../session-manager/) 플러그인으로 분리됨.
+
 ## 설치
 
 ```bash
@@ -94,7 +96,7 @@ Request Changes가 나오면 피드백 반영 후 다시 `/review`.
 ```
 fe-workflow/
 ├── .claude-plugin/
-│   └── plugin.json          ← 플러그인 메타데이터 (v0.3.0)
+│   └── plugin.json          ← 플러그인 메타데이터 (v0.4.0)
 ├── agents/
 │   ├── architect.md          ← 설계 에이전트 (opus)
 │   └── code-reviewer.md      ← 리뷰 에이전트 (sonnet)
@@ -102,9 +104,7 @@ fe-workflow/
 │   ├── architecture.md       ← /architecture 커맨드
 │   ├── review.md             ← /review 커맨드
 │   ├── pr.md                 ← /pr 커맨드 (범용)
-│   ├── _pr.md                ← /pr 커맨드 (회사용 — ISH/Linear)
-│   ├── recap.md              ← /recap 커맨드
-│   └── organization.md       ← /organization 커맨드
+│   └── _pr.md                ← /pr 커맨드 (회사용 — ISH/Linear)
 ├── conventions/
 │   ├── code-principles.md    ← 코드 원칙
 │   ├── folder-structure.md   ← 폴더 구조
@@ -124,9 +124,4 @@ fe-workflow/
 | `/review` | 컨벤션 기반 코드 리뷰 → 점수/피드백 | code-reviewer (sonnet) |
 | `/pr` | 변경사항 분석 → PR 생성 | 없음 (Command 단독) |
 
-### 세션 관리 (분리 예정)
-
-| 커맨드 | 역할 |
-|--------|------|
-| `/recap` | 세션 회고 |
-| `/organization` | 세션 정리 (STATUS.md + DECISIONS.md 업데이트) |
+### 세션 관리 → [session-manager](../session-manager/)로 분리됨 (v0.4)
