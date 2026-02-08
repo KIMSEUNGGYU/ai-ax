@@ -3,7 +3,7 @@
 FE 컨벤션 기반 개발 워크플로우 플러그인.
 설계 → 개발 → 리뷰 → PR 전 과정을 커맨드로 자동화.
 
-> 세션 관리(/organization, /habit)는 v0.4에서 [session-manager](../session-manager/) 플러그인으로 분리됨.
+> 세션 관리(/wrap, /dashboard)는 v0.4에서 [session-manager](../session-manager/) 플러그인으로 분리됨.
 
 ## 설치
 

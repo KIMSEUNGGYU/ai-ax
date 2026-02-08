@@ -34,10 +34,10 @@ claude --plugin-dir ./fe-workflow --plugin-dir ./session-manager
     ↓
 /pr                                              ← fe-workflow
     ↓
-/organization                                    ← session-manager (세션 종료)
+/wrap                                            ← session-manager (세션 마무리)
 ```
 
-- `/habit`은 아무 때나 실행 가능 (습관 대시보드)
+- `/dashboard`는 아무 때나 실행 가능 (습관 대시보드)
 - fe-workflow는 **개발 중**, session-manager는 **세션 시작/종료 시** 동작
 
 ## 커맨드 요약
@@ -54,5 +54,5 @@ claude --plugin-dir ./fe-workflow --plugin-dir ./session-manager
 
 | 커맨드 | 역할 |
 |--------|------|
-| `/organization` | 세션 종료 — 상태 저장 + 로그 + 습관 점수 |
-| `/habit` | 습관 대시보드 — 점수 추이, 개선 포인트 |
+| `/wrap` | 세션 마무리 — 상태 저장 + 로그 + 습관 점수 |
+| `/dashboard` | 습관 대시보드 — 점수 추이, 개선 포인트 |

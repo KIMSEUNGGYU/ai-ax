@@ -1,5 +1,5 @@
 ---
-description: 세션 종료 — 상태 저장 + 활동 로그 + 습관 점수
+description: 세션 마무리 — 상태 저장 + 활동 로그 + 습관 점수
 allowed-tools: Read, Write, Glob, Bash
 argument-hint: [저장할 파일명 (선택)]
 ---

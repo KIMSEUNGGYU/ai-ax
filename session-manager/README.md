@@ -17,20 +17,20 @@ claude --plugin-dir /path/to/session-manager
 
 | 커맨드 | 역할 |
 |--------|------|
-| `/organization` | 세션 종료 — 상태 저장 + 활동 로그 + 습관 점수 |
-| `/habit` | 코딩 습관 대시보드 — 점수 추이, 강점/약점, 개선 포인트 |
+| `/wrap` | 세션 마무리 — 상태 저장 + 활동 로그 + 습관 점수 |
+| `/dashboard` | 습관 대시보드 — 점수 추이, 강점/약점, 개선 포인트 |
 
 ## 워크플로우
 
 ```
-세션 종료          →  /organization →  STATUS.md + 로그 + 점수
+세션 종료          →  /wrap         →  STATUS.md + 로그 + 점수
        ↓
 다음 세션 시작     →  (자동)        →  STATUS.md 로드 + 세션 ID 생성
        ↓
-습관 확인          →  /habit        →  점수 추이 + 개선 포인트
+습관 확인          →  /dashboard    →  점수 추이 + 개선 포인트
 ```
 
-## /organization 3 Phase
+## /wrap 3 Phase
 
 1. **상태 저장**: `.ai/STATUS.md` 덮어쓰기 + `.ai/DECISIONS.md` 누적
 2. **세션 로그**: `.ai/logs/sessions/{YYYY-MM-DD}_{id}.md` 생성
@@ -70,8 +70,8 @@ session-manager/
 ├── .claude-plugin/
 │   └── plugin.json
 ├── commands/
-│   ├── organization.md
-│   └── habit.md
+│   ├── wrap.md
+│   └── dashboard.md
 ├── hooks/
 │   └── hooks.json
 ├── scripts/
