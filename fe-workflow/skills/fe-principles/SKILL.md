@@ -13,18 +13,20 @@ allowed-tools: Read, Grep, Glob, Edit, Write
 | 우선순위 | 원칙 | 핵심 |
 |----------|------|------|
 | 1 | **변경 용이성** | 한 종류 변경 = 한 곳에서 끝 |
-| 2 | **SSOT** | 정의 1곳, 사용 여러 곳 |
+| 2 | **SSOT** | 정의 1곳, 사용 여러 곳. 분리 ≠ 추상화 |
 | 3 | **SRP** | 변경 이유 하나 |
 | 4 | **응집도↑ 결합도↓** | 함께 바뀌는 것끼리, Page First |
 | 5 | **선언적** | What 선언, How는 하위로 |
-| 6 | **추상화** | 레벨 일치, 2-3번 반복 후 추상화 |
-| 7 | **가독성** | 의도 드러나는 이름, 조기 반환 |
+| 6 | **가독성** | 위에서 아래로 읽히는 구조, 뻔한 인터페이스, 조기 반환 |
+| 7 | **인지 부하** | 함수≤30줄, 파라미터≤3, 분기≤3 |
 
-→ 상세: `conventions/code-principles.md`
+→ 상세: [conventions/code-principles.md](../../conventions/code-principles.md)
 
 ## 금지 패턴
 
-- 이른 추상화/파일 추출/상수 추출
+- 이른 추상화 — 분리만 하고 복잡도는 그대로인 훅/유틸 금지
+- 이른 파일 추출 — 재사용 전까지 같은 파일 유지
+- 이른 상수 추출 — 여러 곳 사용 전까지 현재 위치 유지
 - any 타입
 - useEffect 익명 함수
 - 명령형 로딩/에러 분기 (`if (isLoading)`)
@@ -38,84 +40,37 @@ allowed-tools: Read, Grep, Glob, Edit, Write
 - `modules/` = UI + 로직 + 상태 묶음 (여러 페이지 재사용)
 - `_common/` = 도메인 내 형제 페이지 간 공유
 
-→ 상세: `conventions/folder-structure.md`
+→ 상세: [conventions/folder-structure.md](../../conventions/folder-structure.md)
 
 ## API 패턴
 
-```typescript
-// 네이밍: fetch/post/update/delete + 명사
-// 파라미터: 항상 객체
-fetchUser(params: { id: string })
-postUser(params: { name: string })
-```
+- 네이밍: `fetch`/`post`/`update`/`delete` + 명사
+- 파라미터: 항상 `*Params` 타입 객체 (`PostMerchantParams`, `FetchMerchantDetailParams`)
+- httpClient를 통해서만 API 호출 (직접 fetch/ky 금지)
+- DTO: 도메인별 단일 파일 (`[domain].dto.ts`), API 엔드포인트별 주석 그룹
 
-- HttpClient 래퍼로 응답 구조 자동 언래핑
-- 타입: 기준 타입(GET 단건) → Omit/Pick으로 확장
-- VO 패턴: 복잡한 계산 로직 캡슐화 (선택)
-
-→ 상세: `conventions/api-type-layer.md`
+→ 상세: [conventions/api-layer.md](../../conventions/api-layer.md)
 
 ## React Query
 
-```typescript
-// queryOptions 패턴
-const userQuery = {
-  detail: (id: string) => queryOptions({
-    queryKey: ['users', id],
-    queryFn: () => fetchUser({ id }),
-  })
-};
-
-// 사용: useSuspenseQuery 기본
-const { data } = useSuspenseQuery(userQuery.detail('123'));
-```
-
+- queryOptions 팩토리 패턴 (`merchantQuery.detail(id)`)
+- queryKey: `as const`, 계층적 (`['domain', 'action', params]`)
+- list(일반 조회) vs infinite(커서 페이지네이션) queryKey 분리
 - staleTime 설정 필수 (기본 0은 포커스마다 refetch)
-- normalizeFilters로 캐시 효율 관리
+- normalizeFilters: 배열 필터 캐시 효율
+- useSuspenseQuery 기본, useQuery는 특수 케이스만
 - mutateAsync + try-catch (mutate 대신)
 - invalidateQueries는 mutationOptions.onSuccess에서
-- useQuery는 placeholderData, 무한스크롤 등 특수 케이스만
+- queryClient 직접 import (useQueryClient 아님)
 
-## 컴포넌트
-
-- Props는 DTO에서 직접 추출 (SSOT)
-- Suspense + useSuspenseQuery 선언적 비동기
-- overlay-kit으로 모달 관리
-- ts-pattern match로 조건부 렌더링
-- useEffect는 **기명 함수** 필수
-
-→ 상세: `conventions/component-design.md`
-
-## 페이지
-
-- 래핑 순서: ClientOnly → AuthGuard → Context → ErrorBoundary → Suspense → Content
-- 리스트: nuqs 필터 + useInfiniteQuery + keepPreviousData
-- 상세: getServerSideProps 검증 + Context로 ID 전파
-
-→ 상세: `conventions/page-structure.md`
+→ 상세: [conventions/api-layer.md](../../conventions/api-layer.md)
 
 ## 에러 처리
 
-```typescript
-// 구조적 타입 체크 (instanceof 금지)
-function isAppError(error: unknown): error is AppError {
-  return error != null &&
-    typeof error === 'object' &&
-    (error as any)?.name === 'AppError';
-}
-```
-
 - Exception(예상 불가) vs Error State(예상 가능, 타입으로 표현) 구분
+- 구조적 타입 체크 (instanceof 금지, name 속성으로 판별)
 - AppError(범용) + RedirectError(특수 동작) 체계
 - ErrorBoundary로 관심사 분리
 - AsyncBoundary = ErrorBoundary + Suspense + QueryErrorResetBoundary
 
-→ 상세: `conventions/error-handling.md`
-
-## 인지 부하 제한
-
-| 제한 | 기준 |
-|------|------|
-| 함수 길이 | ≤ 30줄 |
-| 파라미터 수 | ≤ 3개 |
-| 분기 깊이 | ≤ 3단계 |
+→ 상세: [conventions/error-handling.md](../../conventions/error-handling.md)
