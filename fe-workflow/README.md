@@ -116,10 +116,17 @@ fe-workflow/
 
 ## 커맨드 요약
 
+### 개발 워크플로우
+
 | 커맨드 | 역할 | Agent |
 |--------|------|-------|
 | `/architecture` | 컨벤션 기반 설계 → 구현 지시서 생성 | architect (opus) |
 | `/review` | 컨벤션 기반 코드 리뷰 → 점수/피드백 | code-reviewer (sonnet) |
 | `/pr` | 변경사항 분석 → PR 생성 | 없음 (Command 단독) |
-| `/recap` | 세션 회고 | — |
-| `/organization` | 세션 정리 | — |
+
+### 세션 관리 (분리 예정)
+
+| 커맨드 | 역할 |
+|--------|------|
+| `/recap` | 세션 회고 |
+| `/organization` | 세션 정리 (STATUS.md + DECISIONS.md 업데이트) |
