@@ -165,3 +165,61 @@ plugin:mini-review:code-reviewer
 플러그인 에이전트는 `plugin:플러그인명:에이전트명`으로 호출해서 내장과 구분.
 
 ---
+
+## 4. Agent — agents/code-reviewer.md
+
+```yaml
+---
+name: code-reviewer
+description: 읽기 전용 코드 리뷰어. 코드를 분석하고 피드백만 제공.
+model: sonnet
+disallowedTools: Write, Edit, Bash, NotebookEdit
+---
+# 본문: 4단계 프로토콜 (변경 파악 → 기준 적용 → 피드백 작성 → 판정)
+# 출력 형식: CRITICAL → HIGH → MEDIUM/LOW → APPROVE/REQUEST_CHANGES
+```
+
+### Agent만의 frontmatter 필드
+
+| 필드 | 역할 | 이 Agent에서 |
+|------|------|---|
+| `name` | 에이전트 식별자 | `code-reviewer` |
+| `description` | 설명 | 리뷰 전용 |
+| `model` | 사용할 모델 | `sonnet` (비용 균형) |
+| `disallowedTools` | 차단할 도구 | Write, Edit, Bash, NotebookEdit |
+
+### disallowedTools = 물리적 역할 제한
+
+```
+쓸 수 있는 것:  Read, Grep, Glob, Task (읽기 + 탐색)
+못 쓰는 것:     Write, Edit, Bash, NotebookEdit (수정 + 실행)
+```
+
+프롬프트 "수정하지 마" → 무시 가능 ❌
+도구 자체 차단 → 물리적으로 불가능 ✅
+
+### model 선택 기준
+
+```
+opus   — 고품질, 고비용. 아키텍처/설계 판단
+sonnet — 균형. 코드 리뷰처럼 양 많은 작업
+haiku  — 저비용. 단순 작업 (파일 나열, 패턴 검색)
+```
+
+### allowed-tools vs disallowedTools 차이
+
+| | Command/Skill | Agent |
+|---|---|---|
+| 방식 | `allowed-tools` (화이트리스트) | `disallowedTools` (블랙리스트) |
+| 의미 | "이것만 허용" | "이것만 차단" |
+| 적용 대상 | 메인 Claude | 서브 에이전트 (독립 인스턴스) |
+
+Claude Code가 컴포넌트별로 지원하는 방식이 다름.
+선택 기준이 아니라 **각 컴포넌트의 스펙**.
+
+### NotebookEdit 참고
+
+Jupyter Notebook(.ipynb) 셀 편집 도구. FE 작업에서는 거의 안 씀.
+코드 리뷰어가 노트북까지 수정하면 안 되니까 함께 차단.
+
+---
