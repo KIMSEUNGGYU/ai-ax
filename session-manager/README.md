@@ -17,15 +17,12 @@ claude --plugin-dir /path/to/session-manager
 
 | 커맨드 | 역할 |
 |--------|------|
-| `/recap` | 세션 회고 — 작업 정리 + AI 협업 패턴 분석 |
 | `/organization` | 세션 종료 — 상태 저장 + 활동 로그 + 습관 점수 |
 | `/habit` | 코딩 습관 대시보드 — 점수 추이, 강점/약점, 개선 포인트 |
 
 ## 워크플로우
 
 ```
-작업 중 회고       →  /recap       →  작업 정리 md 생성
-       ↓
 세션 종료          →  /organization →  STATUS.md + 로그 + 점수
        ↓
 다음 세션 시작     →  (자동)        →  STATUS.md 로드 + 세션 ID 생성
@@ -48,7 +45,7 @@ claude --plugin-dir /path/to/session-manager
 | 피드백 반영 후 재리뷰 | 2 |
 | plan 모드 활용 | 1 |
 | 커밋 단위 (기능별 분리) | 2 |
-| 문서화 (/recap) | 1 |
+| 문서화 | 1 |
 
 ## 저장 구조
 
@@ -73,7 +70,6 @@ session-manager/
 ├── .claude-plugin/
 │   └── plugin.json
 ├── commands/
-│   ├── recap.md
 │   ├── organization.md
 │   └── habit.md
 ├── hooks/
