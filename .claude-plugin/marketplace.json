@@ -8,7 +8,13 @@
       "name": "fe-workflow",
       "source": "./fe-workflow",
       "description": "프론트엔드 개발 워크플로우 플러그인",
-      "version": "0.3.0"
+      "version": "0.4.0"
+    },
+    {
+      "name": "session-manager",
+      "source": "./session-manager",
+      "description": "세션 관리 플러그인 — 활동 로깅, 코딩 습관 분석, 상태 저장",
+      "version": "0.1.0"
     }
   ]
 }
