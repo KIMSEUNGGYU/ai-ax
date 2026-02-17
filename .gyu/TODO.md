@@ -1,8 +1,20 @@
+## ai-ax TODO
+> 개인 플러그인 개선 계획
+
+
+### 개인 환경 개선
+
+- [ ] AI 개인화 패턴 — 컨텍스트 자동 이어받기, 반복 실수/패턴 기록 → 재발 방지 (learning 플러그인 확장)
+- [ ] HUD 설정 — agent, hooks 호출 모니터링 (claude-hud 글로벌 플러그인 설정)
+
+---
+
 ## fe-workflow TODO
 > 미룬 것들 + v0.4 계획
 
 ### v0.4 — 구조 개선
 
+learning-plugin-separation 내용과 연관 있을듯 
 - [ ] 세션 관리 커맨드 분리 (recap.md, organization.md → 별도 플러그인)
   - FE 전용이 아닌 범용 세션 관리 → 독립 플러그인이 적합
   - fe-workflow는 개발 워크플로우(architecture → review → pr)에 집중
