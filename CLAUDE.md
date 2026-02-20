@@ -20,10 +20,12 @@ ai-ax/
 │   └── everything-cc/             ← ECC 구조 분석
 │
 ├── .ai/                           ← Claude 소유 (자유롭게 업데이트)
-│   ├── STATUS.md                  ← 상태 + 로드맵 (/save 관리)
-│   ├── DECISIONS.md               ← 세션별 결정 누적 (/save 관리)
+│   ├── current.md                 ← 활성 작업 문서 (0~1개, 작업 완료 시 삭제)
+│   ├── patterns/                  ← 프로젝트 구현 패턴 (수동 큐레이션)
+│   │   └── README.md              ← 패턴 인덱스
+│   ├── templates/                 ← 작업 문서 템플릿 (simple-task, complex-task)
 │   ├── notes/                     ← /note 산출물
-│   └── logs/                      ← 세션 로그 + 습관 점수
+│   └── logs/                      ← 세션 로그
 │
 ├── fe-workflow/                   ← FE 워크플로우 v0.4 (Skill x1, Command x4, Agent x2, Convention x4)
 ├── session-manager/               ← 세션 상태 관리 v0.1 (Command x3, Hook x1)
@@ -31,21 +33,28 @@ ai-ax/
 └── CLAUDE.md                      ← 이 파일
 ```
 
-## 작업 상태 관리
+## 세션 연속성 (컨벤션 기반)
 
-- **현재 상태 + 로드맵**: `.ai/STATUS.md` (/save가 자동 관리)
-- **결정 기록**: `.ai/DECISIONS.md` (/save가 자동 누적)
-- 학습 참고: `.gyu/plugin-design-study/README.md`
+### 작업 추적: .ai/current.md
+- **활성 작업 1개**를 추적하는 파일. 작업 완료 시 삭제
+- 멀티 세션 걸릴 작업이면 생성, 단순 작업이면 안 만들어도 됨
+- 규모에 따라 스케일: 단순(~20줄) / 복잡(~500줄), 템플릿 참고
 
-## 세션 시작 시
+### 세션 시작 시
+- `.ai/current.md` 존재하면 읽고, 이전 작업 이어갈지 사용자에게 확인
 
-SessionStart hook이 자동으로 STATUS.md를 로드한다.
-수동이 필요하면: `.ai/STATUS.md` 읽기 → 이전 작업 이어갈지 확인.
+### 세션 중 저장
+- 사용자가 "현재 상태 저장해" / "current.md 업데이트해" 요청 시 반영
 
-## 세션 종료 시
+### 세션 종료 시
+- `/wrap` → 세션 분석/제안
 
-1. `/wrap` → 세션 분석/제안 (session-wrap 외부 플러그인)
-2. `/save` → 상태 저장 + 로그 + 점수 (session-manager)
+### 패턴 승격
+- 작업 완료 후, 재사용 가치 있는 구현 패턴은 `.ai/patterns/`로 승격
+- 사용자 직접 요청 or Claude 세션 마무리 시 제안
+
+### 참고
+- 학습 자료: `.gyu/plugin-design-study/README.md`
 
 ## 설계 철학
 
