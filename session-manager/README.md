@@ -1,85 +1,84 @@
 # session-manager
 
-세션 상태 관리 + 습관 측정 플러그인.
-
-> 세션 종료 분석/제안은 [session-wrap](https://github.com/team-attention/plugins-for-claude-natives/tree/main/plugins/session-wrap) 플러그인 사용 추천.
-
-## 설치
-
-```bash
-# 개발 중 (임시)
-claude --plugin-dir /path/to/session-manager
-
-# 정식 적용
-/plugin marketplace add /path/to/ai-ax
-/plugin install session-manager@claude-plugins
-```
+AI 페어 프로그래밍 context 관리 플러그인. 세션 간 맥락을 `.ai/current.md` 파일로 유지한다.
 
 ## 커맨드
 
 | 커맨드 | 역할 |
 |--------|------|
-| `/save` | 세션 상태 저장 — STATUS.md + 활동 로그 + 습관 점수 |
-| `/dashboard` | 습관 대시보드 — 점수 추이, 강점/약점, 개선 포인트 |
-| `/note` | 개발 중 패턴/개념 정리 → `.ai/notes/`에 md 저장 |
+| `/save` | 작업 컨텍스트를 `.ai/current.md`에 저장. `done` 인자 시 삭제 |
+| `/resume` | `.ai/current.md` 수동 복원 (hook 미작동 시 사용) |
+
+## Hook
+
+| 이벤트 | 동작 |
+|--------|------|
+| SessionStart | `.ai/current.md` 존재 시 내용을 additionalContext로 주입 |
 
 ## 워크플로우
 
 ```
-세션 종료          →  /save         →  STATUS.md + 로그 + 점수
-       ↓
-다음 세션 시작     →  (자동)        →  STATUS.md 로드 + 세션 ID 생성
-       ↓
-습관 확인          →  /dashboard    →  점수 추이 + 개선 포인트
+세션 종료       →  /save        →  .ai/current.md 생성/업데이트
+     ↓
+다음 세션 시작  →  (자동 hook)  →  current.md 내용 주입
+     ↓
+(hook 미작동)   →  /resume      →  current.md 수동 로드
+     ↓
+작업 완료       →  /save done   →  current.md 삭제
 ```
 
-## /save 3 Phase
-
-1. **상태 저장**: `.ai/STATUS.md` 덮어쓰기 + `.ai/DECISIONS.md` 누적
-2. **세션 로그**: `.ai/logs/sessions/{YYYY-MM-DD}_{id}.md` 생성
-3. **습관 점수**: `.ai/logs/habit-score.md`에 행 추가
-
-## AI 협업 점수 (/10)
-
-| 항목 | 배점 |
-|------|------|
-| 설계 후 구현 (/architecture → 구현) | 2 |
-| 리뷰 실행 (/review) | 2 |
-| 피드백 반영 후 재리뷰 | 2 |
-| plan 모드 활용 | 1 |
-| 커밋 단위 (기능별 분리) | 2 |
-| 문서화 | 1 |
-
-## 저장 구조
-
-```
-.ai/
-├── STATUS.md              ← 현재 작업 상태 (덮어쓰기)
-├── DECISIONS.md           ← 결정 기록 (누적)
-├── notes/                 ← /note 산출물
-└── logs/
-    ├── habit-score.md     ← 습관 점수 누적 테이블
-    └── sessions/
-        └── {YYYY-MM-DD}_{id}.md  ← 세션별 활동 로그
-```
-
-## Hook
-
-- **SessionStart**: 세션 시작 시 `.ai/STATUS.md` 자동 로드 + 세션 ID 생성
-
-## 구조
+## 파일 구조
 
 ```
 session-manager/
 ├── .claude-plugin/
 │   └── plugin.json
 ├── commands/
-│   ├── save.md
-│   ├── dashboard.md
-│   └── note.md
+│   ├── save.md          ← /save 커맨드
+│   └── resume.md        ← /resume 커맨드
 ├── hooks/
-│   └── hooks.json
+│   └── hooks.json       ← SessionStart hook 등록
 ├── scripts/
-│   └── session-start.mjs
+│   └── session-start.mjs  ← hook 스크립트
 └── README.md
 ```
+
+## current.md 포맷
+
+```markdown
+# {작업 제목}
+
+## 목표
+{한 줄 요약}
+
+## 스펙 참조
+{.ai/specs/ 경로, 없으면 생략}
+
+## 진행
+- [x] 완료 항목
+- [ ] 남은 항목
+
+## 결정사항
+- 결정 + 이유
+
+## 다음 할 일
+{세션 재개 시 바로 시작할 것}
+
+## 메모
+{블로커, 주의사항}
+```
+
+## 설계 히스토리
+
+### v0 → v1 변경 이유
+
+**v0 문제점:**
+- `STATUS.md` + `DECISIONS.md` + 세션 로그 + 습관 점수 등 저장 대상이 너무 많았음
+- learning 플러그인(context/latest.md)과 기능 중복
+- 습관 점수/대시보드는 실제로 거의 안 쓰임
+
+**v1 설계 원칙:**
+- **하나의 파일(`current.md`)로 단순화** — 세션 간 맥락 전달의 단일 진실 공급원
+- 세션 ID, 습관 점수 등 부가 기능 제거
+- `/note`, `/dashboard` 제거 (v2에서 별도 검토)
+- current.md 없으면 hook이 아무것도 주입 안 함 (불필요한 메시지 제거)

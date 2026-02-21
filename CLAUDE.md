@@ -28,7 +28,7 @@ ai-ax/
 │   └── logs/                      ← 세션 로그
 │
 ├── fe-workflow/                   ← FE 워크플로우 v0.4 (Skill x1, Command x4, Agent x2, Convention x4)
-├── session-manager/               ← 세션 상태 관리 v0.1 (Command x3, Hook x1)
+├── session-manager/               ← 세션 context 관리 v1.0 (Command x2, Hook x1)
 ├── mini-review/                   ← 학습용 미니 플러그인 (마켓플레이스 미등록)
 └── CLAUDE.md                      ← 이 파일
 ```
@@ -44,7 +44,11 @@ ai-ax/
 - `.ai/current.md` 존재하면 읽고, 이전 작업 이어갈지 사용자에게 확인
 
 ### 세션 중 저장
-- 사용자가 "현재 상태 저장해" / "current.md 업데이트해" 요청 시 반영
+- `/save` 또는 "현재 상태 저장해" / "current.md 업데이트해" 요청 시 반영
+- `/save done` → current.md 삭제 (작업 완료 처리)
+
+### 세션 재개 (수동)
+- `/resume` → current.md 수동 로드 (hook 미작동 시)
 
 ### 세션 종료 시
 - `/wrap` → 세션 분석/제안

@@ -1,5 +1,5 @@
 {
   "name": "session-manager",
-  "description": "세션 관리 플러그인 — 활동 로깅, 코딩 습관 분석, 상태 저장",
-  "version": "0.1.0"
+  "description": "AI 페어 프로그래밍 context 관리 — 세션 간 맥락 유지",
+  "version": "1.0.0"
 }

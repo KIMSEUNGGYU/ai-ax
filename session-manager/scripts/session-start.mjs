@@ -1,37 +1,29 @@
 /**
- * SessionStart Hook: 세션 시작 시 STATUS.md 로드 + 세션 ID 생성
+ * SessionStart Hook: 세션 시작 시 .ai/current.md 로드
  *
- * - .ai/STATUS.md 내용을 additionalContext로 주입
- * - 세션 ID를 생성해서 컨텍스트에 포함
+ * - .ai/current.md 존재하면 additionalContext로 주입
+ * - 없으면 아무것도 주입하지 않음
  */
 
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { randomBytes } from 'node:crypto';
 
 const projectRoot = process.cwd();
-const statusPath = join(projectRoot, '.ai', 'STATUS.md');
-const today = new Date();
-const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-const sessionId = `${dateStr}_${randomBytes(2).toString('hex')}`;
+const currentPath = join(projectRoot, '.ai', 'current.md');
 
-let statusContent = '';
+let content = '';
 try {
-  statusContent = await readFile(statusPath, 'utf-8');
+  content = await readFile(currentPath, 'utf-8');
 } catch {
-  // STATUS.md 없으면 무시
+  // current.md 없으면 빈 결과
 }
 
-const context = [
-  `[session-manager] 세션 ID: ${sessionId}`,
-  statusContent
-    ? `[session-manager] 이전 작업 상태:\n${statusContent}`
-    : '[session-manager] 이전 작업 상태 없음 (.ai/STATUS.md 미존재)',
-].join('\n\n');
+const result = { continue: true };
 
-console.log(JSON.stringify({
-  continue: true,
-  hookSpecificOutput: {
-    additionalContext: context,
-  },
-}));
+if (content) {
+  result.hookSpecificOutput = {
+    additionalContext: `[session-manager] 이전 작업 컨텍스트:\n${content}`,
+  };
+}
+
+console.log(JSON.stringify(result));
