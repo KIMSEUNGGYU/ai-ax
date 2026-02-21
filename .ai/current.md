@@ -1,35 +1,37 @@
-# session-manager v2 구현
+# 플러그인 정리 + 문서 최신화
 
 ## 목표
-세션 지식 유실 방지 + 저장 체계 확립 — /note, SessionEnd Hook, 저장 체계 추가
+불필요 플러그인/커맨드 제거, 문서(CLAUDE.md, README.md) 현행화
 
 ## 진행
-- [x] v1 리빌드 (커밋 69bbb77)
-- [x] v1 포맷 개선 — 템플릿 구조 확정
-- [x] learning 플러그인 분석
-- [x] v2 범위 확정 논의
-- [x] v2 설계 (brainstorming)
-- [x] v2 구현 계획 (writing-plans)
-- [x] v2 구현 (커밋 802be32)
-- [x] GUIDE.md 작성
-- [x] 실제 세션에서 테스트 (/note, SessionEnd Hook 동작 확인)
+- [x] 플러그인 현황 분석 (fe-workflow, session-manager, learning)
+- [x] learning 플러그인 삭제 (session-manager v2가 대체)
+- [x] docs/plans/ 삭제 (v2 설계/계획 문서, 구현 완료)
+- [x] marketplace.json session-manager 버전 2.0.0 → 0.2.0
+- [x] CLAUDE.md 전면 재작성 (/init 프리픽스, 구조 간결화)
+- [x] README.md 최신화 (learning/session-wrap 제거, 커맨드 반영)
+- [x] fe-workflow `_pr.md` 삭제 (회사용, 개인 불필요)
+- [x] fe-workflow `pr.md` 삭제
+- [x] CLAUDE.md mini-review 참조 제거
+- [x] 글로벌 CLAUDE.md 워크플로우/응답스타일 deprecated 표시 확인
 
 ## 작업 내역
-- v2 설계: brainstorming → 저장 체계 + /note + SessionEnd Hook 확정
-- v2 구현: session-end.mjs, commands/note.md, skills/note.md, hooks.json, plugin.json v2.0.0
-- session-start.mjs: /save 리마인더 추가
-- README.md: v2 컴포넌트 반영
-- CLAUDE.md: /note, 저장 체계, SessionEnd 동기화
-- GUIDE.md: 사용자 가이드 문서 작성
-- 설계/계획 문서: docs/plans/2026-02-21-session-manager-v2-{design,plan}.md
+- `learning/` 디렉토리 전체 삭제
+- `docs/` 디렉토리 전체 삭제
+- `fe-workflow/commands/_pr.md`, `pr.md` 삭제
+- `.claude-plugin/marketplace.json` session-manager 버전 0.2.0
+- `session-manager/.claude-plugin/plugin.json` 버전 0.2.0
+- CLAUDE.md: /init 표준 프리픽스 추가, 플러그인 테이블+컴포넌트 구조 추가, 세션 연속성 간결화
+- README.md: learning/session-wrap/pr 참조 제거, 워크플로우 다이어그램 정리
 
 ## 결정사항
-- /note에 패턴 통합 → 별도 /promote 불필요 (이유: AI 자동 판단으로 충분)
-- 패턴은 AI 제안 + 사용자 승인 (이유: 자동 감지는 노이즈, 수동만은 누락 위험)
-- SessionEnd는 current.md 타임스탬프만 (이유: fire-and-forget이라 Claude 턴 없음)
-- note 스킬 추가 (이유: "정리해줘" 자연어 트리거 편의성)
-- 병렬 작업은 current → current-{task}.md 이름 변경으로 수동 대응 (이유: YAGNI, 가끔 발생)
+- learning 삭제 (이유: session-manager v2가 세션 관리+지식 저장 기능 완전 대체)
+- session-wrap 참조 제거 (이유: 사용 안 함)
+- pr 커맨드 제거 (이유: 개인 개발에 불필요)
+- session-manager 버전 0.2.0으로 관리 (이유: 1.0 미만 개발 단계 표현)
+
+## 다음 작업
+- [ ] fe-workflow 개선 — conventions 다듬기, 설계 산출물 저장 체계, 구조 리뷰
 
 ## 메모
-- SessionEnd Hook은 fire-and-forget — 지능적 업데이트 불가, 타임스탬프 수준만 가능
-- 실제 테스트 필요: /note 저장 위치 판단, SessionEnd 타임스탬프 갱신
+- 글로벌 CLAUDE.md에 워크플로우/응답스타일 섹션에 `(deprecated?)` 표시됨 — 추후 정리 필요
