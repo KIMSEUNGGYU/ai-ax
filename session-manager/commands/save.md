@@ -1,11 +1,18 @@
 ---
 description: 세션 컨텍스트 저장 — .ai/current.md 생성/업데이트
 allowed-tools: Read, Write, Glob, Bash
+argument-hint: [스펙 파일 경로 (선택)]
 ---
 
-세션 종료 시 작업 컨텍스트를 `.ai/current.md`에 저장한다.
+작업 컨텍스트를 `.ai/current.md`에 저장한다. 세션 중 아무 때나 호출 가능.
+
+$ARGUMENTS
 
 ## 동작
+
+### 인자 처리
+- 스펙 파일 경로가 주어지면 → 해당 파일을 읽어서 스펙 참조 섹션에 반영
+- 인자 없으면 → 대화 컨텍스트만으로 작성
 
 ### `.ai/current.md`가 없을 때
 → 대화 컨텍스트에서 아래 정보를 수집하여 새로 생성:
