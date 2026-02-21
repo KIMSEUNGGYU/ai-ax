@@ -25,6 +25,9 @@ if (content) {
     hookEventName: 'SessionStart',
     additionalContext: `[session-manager] 이전 작업 컨텍스트:\n${content}`,
   };
+  result.systemMessage = '[session-manager] current.md 로드됨';
+} else {
+  result.systemMessage = '[session-manager] current.md 없음 — 새 세션';
 }
 
 console.log(JSON.stringify(result));
