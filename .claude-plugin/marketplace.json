@@ -14,7 +14,7 @@
       "name": "session-manager",
       "source": "./session-manager",
       "description": "AI 페어 프로그래밍 context 관리 — 세션 간 맥락 유지",
-      "version": "1.0.0"
+      "version": "0.2.0"
     }
   ]
 }
