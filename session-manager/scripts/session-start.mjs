@@ -18,10 +18,11 @@ try {
   // current.md 없으면 빈 결과
 }
 
-const result = { continue: true };
+const result = {};
 
 if (content) {
   result.hookSpecificOutput = {
+    hookEventName: 'SessionStart',
     additionalContext: `[session-manager] 이전 작업 컨텍스트:\n${content}`,
   };
 }
