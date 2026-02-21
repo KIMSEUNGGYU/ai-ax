@@ -1,54 +1,35 @@
-# session-manager v2 설계
+# session-manager v2 구현
 
 ## 목표
-v1(context 저장/로드)에 기능 추가 + Claude가 실제로 규칙을 따르도록 강화
+세션 지식 유실 방지 + 저장 체계 확립 — /note, SessionEnd Hook, 저장 체계 추가
 
 ## 진행
 - [x] v1 리빌드 (커밋 69bbb77)
 - [x] v1 포맷 개선 — 템플릿 구조 확정
 - [x] learning 플러그인 분석
-- [ ] v2 범위 확정 논의
-- [ ] v2 설계 (plan mode)
-- [ ] v2 구현
-
-## v1 최종 템플릿 구조
-
-| 섹션 | 역할 | 비고 |
-|------|------|------|
-| 목표 | 한 줄 요약 | 필수 |
-| 스펙 참조 | .ai/specs/ 경로 | 없으면 생략 |
-| 진행 | [x] 완료 + [ ] 남은 것 | 필수. [ ]가 곧 다음 할 일 |
-| 작업 내역 | 구체적으로 뭘 했는지 | 필수 |
-| 결정사항 | 결정 + 이유 | 필수 |
-| 메모 | 블로커, 주의사항 | 없으면 생략 |
-| (작업 고유 섹션) | 자유 추가 | 복잡한 작업 시 |
-
-## v2 후보 기능
-- /doc — 내용 정리 → .ai/notes/ 또는 Obsidian (learning에서 이관)
-- doc 스킬 — "정리해줘" 자연어 트리거
-- /promote — 패턴 승격 (.ai/patterns/)
-- Claude 자율 준수 강화
-
-## learning 플러그인 분석 결과
-
-| 컴포넌트 | v1과 겹침 | v2 이관 가치 |
-|----------|-----------|-------------|
-| /clear, /resume | 겹침 | 불필요 |
-| /doc + doc 스킬 | 안 겹침 | 높음 |
-| learning-extractor | 안 겹침 | 낮음 (과설계) |
-
-## 핵심 문제 인식
-Claude가 만든 규칙을 Claude 자신이 안 따름
-- current.md 임의 삭제, /save 미사용
-- 해결: save.md에 삭제 금지 원칙, CLAUDE.md에 명시
+- [x] v2 범위 확정 논의
+- [x] v2 설계 (brainstorming)
+- [x] v2 구현 계획 (writing-plans)
+- [x] v2 구현 (커밋 802be32)
+- [x] GUIDE.md 작성
+- [x] 실제 세션에서 테스트 (/note, SessionEnd Hook 동작 확인)
 
 ## 작업 내역
-- v1 리빌드: plugin.json, session-start.mjs, save.md, resume.md, README.md 재작성
-- v1 포맷 개선: "작업 내역" 추가, "다음 할 일" 제거(진행과 중복), 삭제 기능 제거, 유연성 안내 추가
-- CLAUDE.md 동기화: `/save done` 제거, 삭제 금지 명시
-- learning 분석: /doc(6유형 템플릿), /clear(겹침), learning-extractor(과설계)
+- v2 설계: brainstorming → 저장 체계 + /note + SessionEnd Hook 확정
+- v2 구현: session-end.mjs, commands/note.md, skills/note.md, hooks.json, plugin.json v2.0.0
+- session-start.mjs: /save 리마인더 추가
+- README.md: v2 컴포넌트 반영
+- CLAUDE.md: /note, 저장 체계, SessionEnd 동기화
+- GUIDE.md: 사용자 가이드 문서 작성
+- 설계/계획 문서: docs/plans/2026-02-21-session-manager-v2-{design,plan}.md
 
 ## 결정사항
-- 진행의 [ ] 미완료 = 다음 할 일 → 별도 섹션 불필요 (이유: 중복 제거)
-- current.md 삭제는 사용자만 가능 (이유: Claude 임의 삭제 방지)
-- 복잡한 작업은 작업 고유 섹션 자유 추가 (이유: 템플릿 경직성 방지)
+- /note에 패턴 통합 → 별도 /promote 불필요 (이유: AI 자동 판단으로 충분)
+- 패턴은 AI 제안 + 사용자 승인 (이유: 자동 감지는 노이즈, 수동만은 누락 위험)
+- SessionEnd는 current.md 타임스탬프만 (이유: fire-and-forget이라 Claude 턴 없음)
+- note 스킬 추가 (이유: "정리해줘" 자연어 트리거 편의성)
+- 병렬 작업은 current → current-{task}.md 이름 변경으로 수동 대응 (이유: YAGNI, 가끔 발생)
+
+## 메모
+- SessionEnd Hook은 fire-and-forget — 지능적 업데이트 불가, 타임스탬프 수준만 가능
+- 실제 테스트 필요: /note 저장 위치 판단, SessionEnd 타임스탬프 갱신
