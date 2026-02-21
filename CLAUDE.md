@@ -28,7 +28,7 @@ ai-ax/
 │   └── logs/                      ← 세션 로그
 │
 ├── fe-workflow/                   ← FE 워크플로우 v0.4 (Skill x1, Command x4, Agent x2, Convention x4)
-├── session-manager/               ← 세션 context 관리 v1.0 (Command x2, Hook x1)
+├── session-manager/               ← 세션 context 관리 v2.0 (Command x3, Skill x1, Hook x2)
 ├── mini-review/                   ← 학습용 미니 플러그인 (마켓플레이스 미등록)
 └── CLAUDE.md                      ← 이 파일
 ```
@@ -47,15 +47,20 @@ ai-ax/
 - `/save` 또는 "현재 상태 저장해" / "current.md 업데이트해" 요청 시 반영
 - current.md 삭제는 사용자가 직접 수행 (Claude 임의 삭제 금지)
 
+### 세션 중 지식 저장
+- `/note` 또는 "정리해줘" / "남겨둬" → 세션 지식을 영속 저장소에 저장
+- AI가 내용 성격 판단 → 저장 위치 자동 제안 → 사용자 확인
+- 저장 위치 체계:
+  - `.ai/notes/` ← 프로젝트 설계/분석/결정
+  - `.ai/patterns/` ← 재사용 코드 패턴 (AI 제안 + 사용자 승인)
+  - `~/obsidian-note/00_Inbox/` ← 개인 학습 (TIL, 개념, 트러블슈팅)
+
 ### 세션 재개 (수동)
 - `/resume` → current.md 수동 로드 (hook 미작동 시)
 
 ### 세션 종료 시
+- SessionEnd Hook이 current.md 타임스탬프 자동 갱신
 - `/wrap` → 세션 분석/제안
-
-### 패턴 승격
-- 작업 완료 후, 재사용 가치 있는 구현 패턴은 `.ai/patterns/`로 승격
-- 사용자 직접 요청 or Claude 세션 마무리 시 제안
 
 ### 참고
 - 학습 자료: `.gyu/plugin-design-study/README.md`

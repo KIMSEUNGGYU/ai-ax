@@ -25,7 +25,7 @@ if (content) {
     hookEventName: 'SessionStart',
     additionalContext: `[session-manager] 이전 작업 컨텍스트:\n${content}`,
   };
-  result.systemMessage = '[session-manager] current.md 로드됨';
+  result.systemMessage = '[session-manager] current.md 로드됨. 주요 진전 시 /save로 저장하세요.';
 } else {
   result.systemMessage = '[session-manager] current.md 없음 — 새 세션';
 }
