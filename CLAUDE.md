@@ -45,7 +45,7 @@ ai-ax/
 
 ### 세션 중 저장
 - `/save` 또는 "현재 상태 저장해" / "current.md 업데이트해" 요청 시 반영
-- `/save done` → current.md 삭제 (작업 완료 처리)
+- current.md 삭제는 사용자가 직접 수행 (Claude 임의 삭제 금지)
 
 ### 세션 재개 (수동)
 - `/resume` → current.md 수동 로드 (hook 미작동 시)
