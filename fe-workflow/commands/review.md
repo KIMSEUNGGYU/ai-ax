@@ -37,6 +37,8 @@ Task(
     - {플러그인 루트}/conventions/folder-structure.md
     - {플러그인 루트}/conventions/api-layer.md
     - {플러그인 루트}/conventions/error-handling.md
+    - {플러그인 루트}/conventions/component-patterns.md
+    - {플러그인 루트}/conventions/typescript-patterns.md
 
     리뷰 대상:
     - {파일 경로 목록 — 절대 경로}

@@ -25,6 +25,22 @@ src/
         └── UserProfile.tsx     // user 페이지 전용
 ```
 
+### 배치 우선순위 (3단계)
+
+파일이 어디서 사용되는지에 따라 배치 위치를 결정한다.
+
+| 단계 | 위치 | 조건 |
+|------|------|------|
+| 1. 페이지 로컬 | `{page}/` 하위 | 해당 페이지에서만 사용 |
+| 2. 페이지 그룹 공유 | `{page-group}/_common/` 하위 | 같은 그룹의 형제 페이지 간 공유 |
+| 3. 전역 | `src/` 하위 | 여러 페이지 그룹에서 공유 |
+
+> `{page-group}` 예시: `document-task/` — 하위에 `document-task-list/`, `document-task-detail/`, `assign-manager/` 등 형제 페이지를 묶는 단위
+
+**원칙: 항상 1단계에서 시작, 공유 필요 시에만 상위로 이동**
+
+---
+
 ### Page First
 
 **처음엔 페이지 로컬에 생성하고, 재사용이 필요할 때 상위로 이동한다.**
@@ -233,17 +249,41 @@ modules는 **여러 페이지에서 재사용**하면서 **UI + 로직이 함께
 ```
 src/pages/delivery-status/
 ├── _common/                              # 도메인 내 공유
-│   ├── constants/delivery.ts             # 리스트 + 상세 모두 사용
-│   └── components/DeliveryStatusBadge.tsx
+│   ├── queries/
+│   │   └── delivery-status.query.ts      # 리스트 + 상세 공용 쿼리
+│   ├── mutations/
+│   │   └── delivery-status.mutation.ts
+│   ├── remotes/
+│   │   └── delivery-status.ts            # API 호출 함수
+│   ├── models/
+│   │   └── delivery-status.dto.ts        # 공용 서버 타입
+│   ├── types/
+│   │   └── delivery-status.schema.ts     # 공용 클라이언트 타입
+│   ├── constants/
+│   │   └── delivery.ts
+│   └── components/
+│       └── DeliveryStatusBadge.tsx
 ├── delivery-status-list/                 # 리스트 페이지
+│   ├── components/                       # 페이지 전용 UI만
+│   ├── hooks/                            # 페이지 전용 훅만
+│   └── constants/                        # 페이지 전용 상수만
 └── delivery-status-detail/               # 상세 페이지
+    └── components/
 ```
 
-| 범위 | 위치 | 예시 |
-|------|------|------|
-| 한 페이지 전용 | `{feature}/constants/` | 리스트 전용 columns |
-| 도메인 내 공유 | `{domain}/_common/` | 리스트 + 상세 공유 상수, 뱃지 |
-| 서비스 전역 | `src/constants/` | 서비스 공통 |
+**배치 기준:**
+
+| 리소스 | 위치 | 기준 |
+|--------|------|------|
+| `queries/`, `mutations/`, `remotes/`, `models/`, `types/` | `_common/` | 도메인 내 형제 페이지가 공유하는 경우 |
+| `components/`, `hooks/`, `constants/` | `{page}/` | 해당 페이지 전용인 경우 |
+| 동일 리소스라도 한 페이지만 사용 | `{page}/해당폴더/` | 공유 전까지 로컬 유지 |
+
+| 범위 | 위치 |
+|------|------|
+| 한 페이지 전용 | `{page}/` 하위 각 폴더 |
+| 페이지 그룹 공유 | `{page-group}/_common/` 하위 각 폴더 |
+| 서비스 전역 | `src/` 하위 각 폴더 |
 
 `_` 접두사는 기능 페이지 폴더와 시각적으로 구분하기 위한 컨벤션.
 
