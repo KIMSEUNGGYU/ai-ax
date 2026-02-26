@@ -22,21 +22,28 @@
 | `update` | PUT/PATCH | `updateMerchant` |
 | `delete` | DELETE | `deleteTid` |
 
-### 파라미터: 항상 `*Params` 타입 객체
+### Params / Response 무조건 타입 정의
+
+파라미터가 하나여도 `*Params` 객체로, 응답도 무조건 `*Response` 또는 엔티티 타입으로 정의한다.
 
 ```typescript
-// ✅ *Params 타입으로 정의, 항상 객체 파라미터
+// ✅ — 파라미터 1개여도 객체로, 응답 타입 항상 명시
+interface FetchMerchantDetailParams {
+  merchantId: string;
+}
+
 export const fetchMerchantDetail = (params: FetchMerchantDetailParams) => {
   return httpClient.get<MerchantDetail>(`merchants/${params.merchantId}`);
 };
 
 export const updateMerchant = (params: UpdateMerchantParams) => {
   const { merchantId, ...payload } = params;
-  return httpClient.patch(`merchants/${merchantId}`, { json: payload });
+  return httpClient.patch<UpdateMerchantResponse>(`merchants/${merchantId}`, { json: payload });
 };
 
-// ❌ 인라인 타입, 개별 인자
+// ❌ 인라인 타입, 개별 인자, 응답 타입 누락
 export const fetchMerchantDetail = (merchantId: string) => { ... };
+export const updateMerchant = ({ id, name }: { id: string; name: string }) => { ... };
 ```
 
 ### 공통 페이지네이션 타입
@@ -81,6 +88,31 @@ export const fetchBranchList = (params: FetchBranchListParams) => {
 ## 2. Queries
 
 > queryOptions 팩토리 패턴. queryKey는 계층적으로 수동 관리.
+
+### remotes → queries 레이어 관계
+
+queries의 `queryFn`은 반드시 remotes 함수를 호출한다. 직접 httpClient를 호출하지 않는다.
+
+```typescript
+// ✅ — queryFn에서 remotes 함수 호출
+export const merchantQuery = {
+  detail: (merchantId: string) =>
+    queryOptions({
+      queryKey: merchantKeys.detail(merchantId),
+      queryFn: () => fetchMerchantDetail({ merchantId }),  // remotes 호출
+    }),
+};
+
+// ❌ — queryFn에서 직접 httpClient 호출
+export const merchantQuery = {
+  detail: (merchantId: string) =>
+    queryOptions({
+      queryFn: () => httpClient.get(`merchants/${merchantId}`),  // remotes 우회
+    }),
+};
+```
+
+---
 
 ### queryOptions 패턴
 

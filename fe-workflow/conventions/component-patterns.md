@@ -148,6 +148,169 @@ const [isHolding, setIsHolding] = useBooleanState(false);
 
 ---
 
+## 7. SuspenseQuery 인라인 패턴
+
+컴포넌트 추출 없이 JSX 내에서 부분 Suspense를 적용할 때 `@suspensive/react-query`의 `<SuspenseQuery>`를 사용한다.
+
+```tsx
+import { SuspenseQuery } from '@suspensive/react-query';
+
+// ✅ — 컴포넌트 추출 없이 인라인으로 Suspense 처리
+function OrderPage() {
+  return (
+    <div>
+      <PageHeader />
+      <SuspenseQuery {...orderQuery.detail(orderId)} errorBoundary={<ErrorView />}>
+        {({ data }) => <OrderDetail order={data} />}
+      </SuspenseQuery>
+      <SuspenseQuery {...orderQuery.history(orderId)}>
+        {({ data }) => <OrderHistory items={data.items} />}
+      </SuspenseQuery>
+    </div>
+  );
+}
+
+// ❌ — 부분 Suspense를 위해 컴포넌트 분리 강제
+function OrderDetailSection({ orderId }: { orderId: string }) {
+  const { data } = useSuspenseQuery(orderQuery.detail(orderId));
+  return <OrderDetail order={data} />;
+}
+
+function OrderPage() {
+  return (
+    <div>
+      <PageHeader />
+      <Suspense fallback={<Loading />}>
+        <OrderDetailSection orderId={orderId} />
+      </Suspense>
+    </div>
+  );
+}
+```
+
+**언제 사용:**
+- 페이지 일부 영역만 Suspense 처리할 때
+- TabCount, Badge 등 독립적인 비동기 UI 조각
+
+---
+
+## 8. TableBody Suspense 패턴
+
+테이블 본문(데이터 영역)만 Suspense로 감싸서 헤더/레이아웃은 유지하면서 로딩 처리한다.
+
+```tsx
+// ✅ — TableBody만 Suspense 처리
+function OrderTable() {
+  return (
+    <Table>
+      <TableHead columns={columns} />
+      <ErrorBoundary fallback={<TableErrorBody colSpan={columns.length} />}>
+        <Suspense fallback={<TableSkeletonBody rows={10} colSpan={columns.length} />}>
+          <OrderTableBody />
+        </Suspense>
+      </ErrorBoundary>
+    </Table>
+  );
+}
+
+function OrderTableBody() {
+  const { data } = useSuspenseQuery(orderQuery.list(filters));
+  return (
+    <tbody>
+      {data.items.map(order => (
+        <OrderTableRow key={order.id} order={order} />
+      ))}
+    </tbody>
+  );
+}
+
+// ❌ — 테이블 전체를 Suspense로 감싸 헤더도 로딩 시 사라짐
+<Suspense fallback={<Loading />}>
+  <OrderTable />
+</Suspense>
+```
+
+---
+
+## 9. Form 패턴
+
+`react-hook-form` + Zod로 폼을 구성한다. 스키마 정의 → 타입 파생 → useForm 순서로 작성.
+
+```tsx
+// types/order.schema.ts
+export const orderFormSchema = z.object({
+  name: z.string().min(1, '필수'),
+  quantity: z.number().min(1),
+});
+
+export type OrderFormData = z.infer<typeof orderFormSchema>;
+
+// OrderForm.tsx
+function OrderForm() {
+  const form = useForm<OrderFormData>({
+    resolver: zodResolver(orderFormSchema),
+    defaultValues: { name: '', quantity: 1 },
+  });
+
+  const { mutateAsync: createOrder } = useMutation(orderMutation.create());
+
+  const handleFormSubmit = async (data: OrderFormData) => {
+    try {
+      await createOrder(data);
+      showSuccessToast('등록 완료');
+    } catch (error) {
+      showErrorToast(error);
+    }
+  };
+
+  return (
+    <form onSubmit={form.handleSubmit(handleFormSubmit)}>
+      <Controller
+        control={form.control}
+        name="name"
+        render={({ field, fieldState }) => (
+          <Input {...field} error={fieldState.error?.message} />
+        )}
+      />
+    </form>
+  );
+}
+```
+
+### useFieldArray (동적 목록)
+
+```tsx
+// ✅ — useFieldArray로 동적 행 관리
+function ItemListForm() {
+  const form = useForm<{ items: ItemField[] }>({
+    defaultValues: { items: [{ name: '', quantity: 1 }] },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: 'items',
+  });
+
+  return (
+    <form>
+      {fields.map((field, index) => (
+        <div key={field.id}>
+          <Controller
+            control={form.control}
+            name={`items.${index}.name`}
+            render={({ field }) => <Input {...field} />}
+          />
+          <Button onClick={() => remove(index)}>삭제</Button>
+        </div>
+      ))}
+      <Button onClick={() => append({ name: '', quantity: 1 })}>추가</Button>
+    </form>
+  );
+}
+```
+
+---
+
 ## ✅ DO & ❌ DON'T
 
 ### ✅ DO
@@ -157,6 +320,10 @@ const [isHolding, setIsHolding] = useBooleanState(false);
 - boolean props: 접두어 없이, `true`/`false` 명시
 - 비-boolean 조건부 렌더링: 삼항 연산자
 - 복잡한 상태 분기: 단일 상태 + SwitchCase/match
+- 부분 Suspense: `<SuspenseQuery>` 인라인 패턴
+- 테이블: TableBody만 Suspense로 감싸기
+- 폼: react-hook-form + Zod 스키마 → 타입 파생
+- 동적 목록: useFieldArray
 
 ### ❌ DON'T
 - `isOpen`, `canClick`, `shouldAnimate` 접두어 props
@@ -164,6 +331,9 @@ const [isHolding, setIsHolding] = useBooleanState(false);
 - `{count && <Badge />}` (숫자/문자열 && 조건부 렌더링)
 - 여러 boolean 상태 조합으로 분기
 - `onClickButton`, `clickHandler` 등 비표준 핸들러 네이밍
+- 부분 Suspense를 위해 불필요한 컴포넌트 분리
+- 테이블 전체를 Suspense로 감싸기 (헤더 포함)
+- 폼 타입을 별도 interface로 정의 (Zod 스키마에서 파생할 것)
 
 ---
 

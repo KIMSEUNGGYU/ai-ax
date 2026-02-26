@@ -326,6 +326,81 @@ interface Props {
 
 ---
 
+## 13. any / as 금지
+
+타입 안전성을 포기하는 `any`와 `as` 타입단언을 금지한다.
+
+```tsx
+// ✅ — 정확한 타입 정의
+interface ApiResponse<T> {
+  data: T;
+  status: number;
+}
+
+function processData(response: ApiResponse<User>) {
+  return response.data.name;
+}
+
+// ✅ — unknown + 타입 가드로 안전하게
+function handleError(error: unknown) {
+  if (error instanceof Error) {
+    console.log(error.message);
+  }
+}
+
+// ❌
+const data = response as User;       // as 타입단언
+const result: any = fetchData();     // any
+function process(data: any) { ... }  // any 파라미터
+```
+
+**예외:** DOM 접근, 서드파티 라이브러리 연동 등 불가피한 경우 주석으로 이유 명시.
+
+---
+
+## 14. Discriminated Union
+
+연관된 타입 변형은 판별자(discriminant) 필드를 활용해 관계로 정의한다.
+
+```tsx
+// ✅ — 판별자(discriminant)로 타입 관계 정의
+type PaymentForm =
+  | { method: 'card'; cardNumber: string; expiry: string }
+  | { method: 'bank'; bankCode: string; accountNumber: string }
+  | { method: 'virtual'; bankCode: string };
+
+function renderForm(form: PaymentForm) {
+  switch (form.method) {
+    case 'card':
+      return <CardForm cardNumber={form.cardNumber} />;  // cardNumber 타입 보장
+    case 'bank':
+      return <BankForm bankCode={form.bankCode} />;
+    case 'virtual':
+      return <VirtualForm bankCode={form.bankCode} />;
+  }
+}
+
+// ✅ — API 응답 상태를 관계로
+type OrderStatus =
+  | { status: 'pending' }
+  | { status: 'processing'; startedAt: string }
+  | { status: 'completed'; completedAt: string; invoiceId: string }
+  | { status: 'failed'; reason: string };
+
+// ❌ — 독립 boolean 조합으로 불가능한 상태 생성
+interface Order {
+  isProcessing: boolean;
+  isCompleted: boolean;   // isProcessing: true & isCompleted: true 가능?
+  isFailed: boolean;
+  completedAt?: string;   // 어느 상태에서 값이 있는지 불명확
+  reason?: string;
+}
+```
+
+**이유:** 불가능한 상태를 타입 레벨에서 제거. `switch`에서 exhaustive 체크 가능.
+
+---
+
 ## ✅ DO & ❌ DON'T
 
 ### ✅ DO
@@ -340,17 +415,22 @@ interface Props {
 - 고수준 → 저수준 배치 순서
 - 라이브러리 클래스: 타입 가드 함수로 체크
 - es-toolkit, react-simplikit 적극 활용
+- 연관 타입 변형은 Discriminated Union으로 관계 정의
+- 타입 불명확 시 정확한 타입 정의 (any/as 대신)
 
 ### ❌ DON'T
 - `!!something`, `Boolean(something)` 강제 캐스팅
 - 중복 null 체크 (`=== null || === undefined`)
 - `enum` 키워드 사용
+- `any` 사용
+- `as` 타입단언 (불가피한 경우 주석 필수)
 - reduce에서 `as` 타입단언
 - 누적 스프레드 reduce (`{ ...acc, key: val }`)
 - `export default` (pages/ 제외)
 - 매직 넘버/문자열 하드코딩
 - `instanceof`로 라이브러리 클래스 판별
 - interface에서 method 형태 함수 타입
+- 독립 boolean 여러 개로 연관 상태 표현
 
 ---
 
