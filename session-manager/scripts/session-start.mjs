@@ -47,6 +47,7 @@ const messageParts = [];
 // INDEX.md 주입
 if (indexContent) {
   contextParts.push(`[session-manager] 프로젝트 컨텍스트:\n${indexContent}`);
+  messageParts.push('[session-manager] INDEX.md 로드됨');
 }
 
 // current.md 하위 호환
