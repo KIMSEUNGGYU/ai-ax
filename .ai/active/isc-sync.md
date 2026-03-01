@@ -68,4 +68,4 @@ Slack, Calendar 등 흩어진 활동 데이터를 자동 수집·정리하는 Cl
 ## 관련 작업
 - [Context Engineering 시스템 설계](context-engineering-설계.md) — 플러그인 구현 완료, 실사용 테스트 남음
 
-<!-- last-active: 2026-02-28 12:29 -->
+<!-- last-active: 2026-02-28 14:13 -->
