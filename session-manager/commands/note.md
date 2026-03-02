@@ -1,6 +1,7 @@
 ---
 description: 세션 지식 영속 저장 — AI가 저장 위치 자동 판단
 allowed-tools: Read, Write, Edit, Glob, AskUserQuestion
+argument-hint: [정리할 내용 (선택)]
 ---
 
 세션 대화에서 나온 지식을 영속 저장소에 저장한다.
