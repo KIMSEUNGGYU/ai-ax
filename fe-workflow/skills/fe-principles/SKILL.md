@@ -30,11 +30,7 @@ allowed-tools: Read, Grep, Glob, Edit, Write
 - any 타입
 - useEffect 익명 함수
 - 명령형 로딩/에러 분기 (`if (isLoading)`)
-- instanceof 에러/클래스 판별
-- `!!something`, `Boolean(something)` 강제 boolean 캐스팅
-- enum 키워드 (→ `as const` 사용)
-- `export default` (pages/ 제외)
-- reduce 타입단언 (`{} as Type`)
+- instanceof 에러 판별
 
 ## 폴더 구조
 
@@ -68,31 +64,6 @@ allowed-tools: Read, Grep, Glob, Edit, Write
 - queryClient 직접 import (useQueryClient 아님)
 
 → 상세: [conventions/api-layer.md](../../conventions/api-layer.md)
-
-## 컴포넌트 패턴
-
-- 빈 렌더링: `return null` 명시
-- 이벤트 핸들러: `handle{TargetName}{EventType}` (`handleButtonClick`, `handleFormSubmit`)
-- Boolean props: `is`/`can`/`should` 접두어 금지, `true`/`false` 명시 (`open={true}` not `isOpen`)
-- 조건부 렌더링: boolean 아닌 값은 삼항 연산자 (`title != null ? <h1> : null`)
-- 복잡한 분기: 단일 상태 + SwitchCase/match (여러 boolean 조합 금지)
-
-→ 상세: [conventions/component-patterns.md](../../conventions/component-patterns.md)
-
-## TypeScript 패턴
-
-- boolean 체크: `!= null`, `@tossteam/is` 라이브러리 (`is.falsy`, `is.nonEmptyArray`)
-- null 불가 상황: non-null assertion(`!`) 사용 (optional chaining `?.` 대신)
-- enum 금지 → `as const` 객체
-- Nilable vs Optional: `T | undefined` vs `param?` 구분
-- 고차함수 변수명: 복수→단수 (`users.map(user => ...)`)
-- reduce: Generic 타입 지정, mutate 패턴 (`{ ...acc }` 금지)
-- 함수 배치: 고수준 → 저수준 순서
-- export default 금지 (pages/ 제외)
-- 라이브러리 클래스 체크: 타입 가드 함수 (instanceof 금지)
-- 유틸: es-toolkit, react-simplikit 적극 활용
-
-→ 상세: [conventions/typescript-patterns.md](../../conventions/typescript-patterns.md)
 
 ## 에러 처리
 

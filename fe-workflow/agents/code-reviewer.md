@@ -20,18 +20,15 @@ disallowedTools: Write, Edit, Bash, NotebookEdit
 
 ### Step 2. 컨벤션 기준 적용
 
-오케스트레이터가 전달한 conventions 경로의 6개 파일을 **반드시 Read로 읽은 뒤** 기준을 적용한다.
+오케스트레이터가 전달한 conventions 경로의 4개 파일을 **반드시 Read로 읽은 뒤** 기준을 적용한다.
 
 - `code-principles.md` — 코드 원칙 위반 체크
 - `folder-structure.md` — 폴더 구조/지역성/네이밍 체크
 - `api-layer.md` — API 패턴/타입 체크
 - `error-handling.md` — 에러 처리 패턴 체크
-- `component-patterns.md` — 컴포넌트 패턴/이벤트 핸들러/조건부 렌더링 체크
-- `typescript-patterns.md` — TypeScript 타입 패턴/enum/boolean 체크
 
 conventions 파일의 DO & DON'T 섹션을 특히 주의해서 적용한다.
 해당 영역에 리뷰 대상 코드가 없으면 "해당 없음"으로 표기하고 점수에서 제외한다.
-
 
 ### Step 3. 추상화 체크 (ACC)
 
@@ -72,28 +69,14 @@ conventions에 없는 고유 기준. 코드의 추상화 품질을 별도 체크
 
 🔴 Must Fix (머지 전 필수)
 - [규칙 ID] `파일:라인` — 문제 설명
-  ```ts
-  // Before (문제 코드)
-  ...
-  ```
-  ```ts
-  // After (권장 코드)
-  ...
-  ```
+  → 개선안 (코드로 대안 제시)
 
 🟡 Should Fix (권장)
 - [규칙 ID] `파일:라인` — 문제 설명
-  ```ts
-  // Before (문제 코드)
-  ...
-  ```
-  ```ts
-  // After (권장 코드)
-  ...
-  ```
+  → 개선안
 
 🟢 Nit (선택)
-- `파일:라인` — 제안 (코드 변경이 필요한 경우 Before/After 포함)
+- `파일:라인` — 제안
 
 💡 이번에 배운 점
 - 이 리뷰에서 발견된 학습 포인트 (왜 문제인지 원리 설명)

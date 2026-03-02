@@ -4,6 +4,36 @@
 
 ---
 
+## 리뷰 마인드셋
+
+### 코드 보기 전 먼저 생각하기
+
+```
+❌ 바로 코드 보기 → 끌려들어감 → 납득 → 리뷰할 게 없음
+✅ "나라면 어떻게?" 먼저 생각 → 비교하며 리뷰
+```
+
+### use 훅은 콘센트다
+
+`use`로 시작하는 것들(useState, useQuery)은 제약이 많다. 방 공사할 때 콘센트 위치를 먼저 고민하듯, 상태 위치를 먼저 설계해야 나중에 대공사를 안 한다.
+
+### 디자이너 머릿속 따라가기
+
+변경 요청은 디자인 단위로 온다. 컴포넌트도 그 단위로 나누면 변경이 한 곳에서 끝난다:
+
+```tsx
+// ❌ 천재적 추상화 — "카드만 버튼 추가" 시 분기 복잡도 증가
+<StyledTextRow isExcluded={...} category={...} />
+
+// ✅ 디자이너 사고방식 = 변경 단위
+<CardConsumptionRow />
+<AccountConsumptionRow />
+<EtcConsumptionRow />
+<RefundConsumptionRow />
+```
+
+---
+
 ## 최상위 원칙: 변경 용이성
 
 > 한 가지 변경은 한 곳에서만 수정되어야 한다.
@@ -390,10 +420,64 @@ function FormField({ value, onChange }: Props) {
 - 과도한 에러 핸들링 (일어나지 않을 시나리오 대비)
 - any 타입 사용
 
+#### 이른 추상화 구체적 안티패턴
+
+다음은 리뷰에서 자주 제안되지만, 오히려 코드를 악화시키는 패턴이다:
+
+```typescript
+// ❌ 1회용 인라인 문자열을 상수로 추출
+// 사용처 바로 위에 있으면 괜찮지만, 파일 상단에 선언하면 시점 이동만 유발
+const DELIVERY_TYPE = { AVAILABLE: '선출고 가능', UNAVAILABLE: '선출고 불가' } as const;
+// ... (수십 줄의 다른 코드) ...
+<Radio label={DELIVERY_TYPE.AVAILABLE} checked={field.value === DELIVERY_TYPE.AVAILABLE} />
+
+// ✅ 인라인이 더 명확
+<Radio label="선출고 가능" checked={field.value === '선출고 가능'} />
+```
+
+```tsx
+// ❌ 단순 JSX 조각을 헬퍼 컴포넌트로 추출
+// 실제 레이블 스타일이 여러 패턴(semibold/grey700, grey800, 아이콘 유무)일 때
+// 헬퍼로 통합하면 원래 디자인 의도가 왜곡됨
+function RequiredLabel({ children }) { return <><Txt>{children}</Txt><Icon name="dot-red" /></>; }
+
+// ✅ 패턴이 다르면 인라인이 더 정확
+<label><Txt fontWeight="semibold" color={grey700}>{name}</Txt><Icon name="dot-red" /></label>
+<label><Txt color={grey800}>{name}</Txt><Icon name="dot-red" /></label>
+```
+
+```typescript
+// ❌ 의도가 명확한 단순 표현식을 변수로 추출
+const isSubmittable = form.formState.isValid && !isPending;
+<Button disabled={!isSubmittable}>제출</Button>
+
+// ✅ 인라인이 충분히 읽힘
+<Button disabled={!form.formState.isValid || isPending}>제출</Button>
+```
+
+```typescript
+// ❌ 1회 사용 변환 로직을 함수로 추출 — 시점 이동만 유발
+function toPostDocumentParams(data: FormInput): PostParams {
+  return { ...data, contacts: data.contact ? [data.contact] : undefined, files: [] };
+}
+await mutateAsync(toPostDocumentParams(data));
+
+// ✅ 인라인이 흐름을 끊지 않음
+await mutateAsync({
+  ...data,
+  contacts: data.contact ? [data.contact] : undefined,
+  files: [],
+});
+```
+
+> **판단 기준:** 추출했을 때 (1) 재사용되거나 (2) 복잡한 로직이 추상화되어 읽기 쉬워지는 경우에만 추출한다.
+> 단순히 "분리"만 하는 추출은 오히려 시점 이동(indirection)으로 가독성을 해친다.
+
 ---
 
 ## 버전 히스토리
 
 | 버전 | 날짜 | 변경사항 |
 |------|------|----------|
-| 1.0.0 | 2026-02-08 | 코드 원칙 컨벤션 초판 (best-code 소스 기반) |
+| 0.1.0 | 2026-02-08 | 코드 원칙 컨벤션 초판 (best-code 소스 기반) |
+| 0.2.0 | 2026-02-27 | 이른 추상화 구체적 안티패턴 4가지 추가 (ISH-1229 리뷰 학습) |

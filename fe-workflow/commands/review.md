@@ -37,17 +37,12 @@ Task(
     - {플러그인 루트}/conventions/folder-structure.md
     - {플러그인 루트}/conventions/api-layer.md
     - {플러그인 루트}/conventions/error-handling.md
-    - {플러그인 루트}/conventions/component-patterns.md
-    - {플러그인 루트}/conventions/typescript-patterns.md
 
     리뷰 대상:
     - {파일 경로 목록 — 절대 경로}
 
     변경 요약:
     - {각 파일의 변경 내용 요약}
-
-    출력 요구사항:
-    - Must Fix / Should Fix 항목은 각각 문제 코드와 권장 코드를 코드 블록으로 첨부
   "
 )
 ```
@@ -68,7 +63,7 @@ Agent가 반환한 리뷰 결과를 **그대로** 사용자에게 전달한다.
 
 출력에 포함되어야 할 것:
 - 점수 테이블 (5개 영역)
-- Must Fix / Should Fix / Nit 목록 (각 항목에 문제 코드 + 권장 코드 코드 블록 포함)
+- Must Fix / Should Fix / Nit 목록
 - 학습 포인트
 - 승인 여부
 

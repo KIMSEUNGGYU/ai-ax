@@ -42,8 +42,6 @@ Task(
     - {플러그인 루트}/conventions/folder-structure.md
     - {플러그인 루트}/conventions/api-layer.md
     - {플러그인 루트}/conventions/error-handling.md
-    - {플러그인 루트}/conventions/component-patterns.md
-    - {플러그인 루트}/conventions/typescript-patterns.md
 
     요구사항:
     - {Phase 1에서 수집한 기능/배경/제약}
