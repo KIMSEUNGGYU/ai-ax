@@ -121,22 +121,20 @@ export const merchantQuery = {
 - 계층적 구조: `['domain', 'action', params]`
 - list: 일반 API 조회, infinite: 커서 기반 페이지네이션 → queryKey 분리하여 독립 invalidate
 
-### staleTime / gcTime
+### staleTime / gcTime (필요 시)
 
 ```typescript
-// 자주 바뀌지 않는 데이터: staleTime 설정
+// 자주 바뀌지 않는 데이터에만 staleTime 설정
 queryOptions({
   queryKey: merchantKeys.statusList(),
   queryFn: fetchMerchantStatusList,
   staleTime: 24 * 60 * 60 * 1000, // 1일간 fresh
 });
-
-// 기본값 (staleTime: 0)은 포커스 이동마다 refetch → 대부분 설정 필요
 ```
 
 | 옵션 | 역할 |
 |------|------|
-| staleTime | 데이터 신선도 기준. 이 시간 내엔 refetch 안 함 |
+| staleTime | 데이터 신선도 기준. 이 시간 내엔 refetch 안 함. 기본값 0 |
 | gcTime | 메모리 캐시 유지 시간. unmount 후에도 캐시 유지 |
 
 ### normalizeFilters (배열 필터 캐시 효율)
@@ -439,7 +437,7 @@ API 관련 코드 작성 시 아래 순서로 정의한다.
 
 ---
 
-## 6. 고급 패턴
+## 7. 고급 패턴
 
 ### Prefetch
 
@@ -485,9 +483,10 @@ mutationOptions({
 - mutationOptions의 onSuccess에서 invalidateQueries 처리
 - mutateAsync + try-catch로 에러 처리
 - 서버 타입(DTO)과 클라이언트 타입 분리
-- staleTime 설정으로 불필요한 refetch 방지
+- 자주 안 바뀌는 데이터엔 staleTime 설정 고려
 - normalizeFilters로 캐시 효율 관리
 - useSuspenseQuery 기본 사용
+- DTO 속성에 `/** 한글 설명 */` JSDoc 주석 추가
 
 ### ❌ DON'T
 - remote 함수에서 개별 인자 받기
@@ -495,7 +494,7 @@ mutationOptions({
 - 컴포넌트에서 직접 queryClient.invalidateQueries 호출하기
 - mutate + onSuccess/onError 콜백 패턴 사용하기
 - 서버 응답 타입에 클라이언트 전용 필드 추가하기
-- staleTime 없이 기본값(0) 사용 (포커스마다 refetch)
+- 정적 데이터에 staleTime 미설정 (불필요한 refetch 발생)
 
 ---
 
@@ -506,3 +505,6 @@ mutationOptions({
 | 2025-02-05 | 초안 |
 | 2026-02-08 | HttpClient 래퍼, staleTime, normalizeFilters, Suspense 추가 |
 | 2026-02-08 | 톤 정리 — 폴더 구조 중복 제거, HttpClient 구현→규칙 축소, VO/SSR 제거, SearchParamsBuilder 추가, mutations 실제 패턴 반영 |
+| 2026-03-04 | Prefetch, Optimistic Update 패턴 추가 |
+| 2026-03-04 | DTO 속성 JSDoc 주석 규칙 추가, 섹션 번호 정리 |
+| 2026-03-05 | staleTime 톤 다운 (필수 → 필요 시), DO/DON'T 조정 |

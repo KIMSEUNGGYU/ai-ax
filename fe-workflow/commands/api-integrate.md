@@ -38,6 +38,33 @@ argument-hint: @백엔드_API_폴더_경로
    - 자동 생성 로직 (예: agencyCode)
    - 에러 케이스 (409 중복, 404 없음 등)
 
+### Phase 1.5: API 스펙 문서 생성
+1. **`.ai/specs/api/{domain}.md` 확인**
+   - 해당 도메인 스펙 문서가 이미 있는지 확인
+   - 있으면 → 새 엔드포인트만 추가
+   - 없으면 → 새 파일 생성
+
+2. **스펙 문서 작성**
+   - Phase 1에서 분석한 내용 기반
+   - 형식:
+   ```markdown
+   # {Domain} API
+
+   > Base: `/v2/{base-path}`
+
+   ## METHOD /endpoint
+
+   설명
+
+   **Params**
+   | 위치 | 이름 | 타입 | 필수 | 설명 |
+   |------|------|------|------|------|
+   | path | id | number | O | 리소스 ID |
+   | body | name | string | O | 이름 |
+
+   **Response**: `{Type}` 또는 `void`
+   ```
+
 ### Phase 2: 프론트엔드 패턴 분석
 1. **기존 remotes 패턴 확인**
    - `src/pages/**/remotes/*.ts` 파일 2~3개 샘플링
@@ -78,6 +105,19 @@ argument-hint: @백엔드_API_폴더_경로
 **위치**:
 - Page First: `src/pages/{page}/{subpage}/models/{resource}.dto.ts`
 - 공유: `src/models/{resource}.dto.ts`
+
+**⚠️ 백엔드 DTO 필드 검증:**
+- 백엔드 Response DTO에 실제로 존재하는 필드만 프론트 DTO에 정의
+- 백엔드에서 아직 추가 안 된 필드는 `TODO` 주석으로 표시하고 타입에서 제외
+- 프론트 DTO에 있는데 백엔드 DTO에 없는 필드 → 런타임에 `undefined`가 되어 에러 유발
+```typescript
+// ⚠️ 백엔드 미구현 필드는 타입에 넣지 않음
+interface Info {
+  status: string;
+  assignee?: string;
+  // TODO: documentId — 백엔드 추가 후 타입에 포함
+}
+```
 
 **내용**:
 ```typescript
@@ -154,13 +194,55 @@ export const delete{Resource} = async (params: Delete{Resource}Params) => {
   };
   ```
 
-#### 4.3 Mutations 파일 생성
+#### 4.3 Queries 파일 생성
+**위치**: `src/pages/{page}/{subpage}/queries/{resource}.query.ts`
+
+**내용** (GET 엔드포인트가 있을 때):
+```typescript
+import { queryOptions, infiniteQueryOptions } from '@tanstack/react-query';
+import { fetch{Resource}s, fetch{Resource}Detail } from '../remotes/{resource}';
+
+const {resource}Keys = {
+  all: ['{resource}'] as const,
+  list: (filters: {Resource}Filters) => [...{resource}Keys.all, 'list', filters] as const,
+  infinite: (filters: {Resource}Filters) => [...{resource}Keys.all, 'infinite', filters] as const,
+  detail: (id: string) => [...{resource}Keys.all, 'detail', id] as const,
+};
+
+export const {resource}Queries = {
+  list: (filters: {Resource}Filters) =>
+    queryOptions({
+      queryKey: {resource}Keys.list(filters),
+      queryFn: () => fetch{Resource}s({ filters }),
+    }),
+  infinite: (filters: {Resource}Filters) =>
+    infiniteQueryOptions({
+      queryKey: {resource}Keys.infinite(filters),
+      queryFn: ({ pageParam }) => fetch{Resource}s({ filters, cursor: pageParam }),
+      initialPageParam: undefined as number | undefined,
+      getNextPageParam: (lastPage) => lastPage?.cursor,
+    }),
+  detail: (id: string) =>
+    queryOptions({
+      queryKey: {resource}Keys.detail(id),
+      queryFn: () => fetch{Resource}Detail({ id }),
+    }),
+};
+```
+
+**규칙:**
+- GET 엔드포인트별로 queryOptions 생성
+- keys 객체는 `as const`로 타입 보존
+- list/infinite 분리 (커서 페이지네이션 있을 때)
+- `{resource}Keys`를 export하여 mutation의 invalidateQueries에서 사용
+
+#### 4.5 Mutations 파일 생성
 **위치**: `src/pages/{page}/{subpage}/mutations/{resource}.mutation.ts`
 
 **내용**:
 ```typescript
-import { mutationOptions } from '@tanstack/react-query';
 import { queryClient } from 'lib/queryClient';
+import { mutationOptions } from 'utils/mutationOptions';
 import type { Create{Resource}Params } from '../models/{resource}.dto';
 import { {resource}Keys } from '../queries/{resource}.query';
 import { create{Resource}, update{Resource}, delete{Resource} } from '../remotes/{resource}';
@@ -198,7 +280,7 @@ export const {resource}Mutations = {
 };
 ```
 
-#### 4.4 페이지 통합
+#### 4.6 페이지 통합
 **기존 페이지 수정**:
 
 1. **Import 추가**
@@ -289,11 +371,13 @@ pages/{page}/
 ```
 ✅ {Resource} API 통합 완료
 
-생성된 파일:
-- models/{resource}.dto.ts (DTO 타입 3개)
-- remotes/{resource}.ts (API 함수 4개)
-- mutations/{resource}.mutation.ts (mutation 3개)
-- {Page}Page.tsx (mutation 적용)
+생성/수정된 파일:
+- .ai/specs/api/{domain}.md (API 스펙 문서)
+- models/{resource}.dto.ts (DTO 타입)
+- remotes/{resource}.ts (API 함수)
+- queries/{resource}.query.ts (queryOptions — GET 있을 때)
+- mutations/{resource}.mutation.ts (mutationOptions — POST/PUT/PATCH/DELETE 있을 때)
+- {Page}Page.tsx (페이지 통합)
 
 타입체크 통과 ✓
 ```
