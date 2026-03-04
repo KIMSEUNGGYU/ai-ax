@@ -1,7 +1,6 @@
 ---
 name: fe-principles
-description: 프론트엔드 코드 작성/리뷰/리팩토링 시 적용할 원칙. 코드 관련 작업에 자동 적용
-allowed-tools: Read, Grep, Glob, Edit, Write
+description: Use when writing, reviewing, or refactoring frontend code. Triggers on React components, hooks, API integration, TypeScript patterns, folder structure decisions, or error handling implementation.
 ---
 
 # 프론트엔드 코드 원칙

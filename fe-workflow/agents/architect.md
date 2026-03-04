@@ -1,6 +1,6 @@
 ---
 name: architect
-description: FE 컨벤션 기반 설계 전문가. 코드베이스 분석 후 구현 지시서 생성.
+description: FE 컨벤션 기반 설계 전문가. 새 기능 구현, 폴더 구조 결정, API 계층 설계, 컴포넌트 분리 전략이 필요할 때 사용.
 model: opus
 disallowedTools: Write, Edit, Bash, NotebookEdit
 ---

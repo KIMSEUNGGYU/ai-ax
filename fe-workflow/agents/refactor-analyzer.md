@@ -1,6 +1,6 @@
 ---
 name: refactor-analyzer
-description: 코드 중복, 복잡도, 추상화 기회 분석
+description: 코드 중복, 복잡도, 추상화 기회 분석. 리팩토링 대상 식별, 코드 스멜 감지, 기술 부채 평가가 필요할 때 사용.
 model: opus
 allowed-tools: Read, Glob, Grep, WebSearch
 ---
@@ -124,16 +124,16 @@ function useFormSubmit<T>(options: {
 ## 마이그레이션 경로
 
 ### Phase 1: Quick Wins (영향도 높음, 노력 낮음)
-1. 유틸 함수 추출 (예상: 2시간)
-2. 중복 타입 통합 (예상: 1시간)
+1. 유틸 함수 추출
+2. 중복 타입 통합
 
 ### Phase 2: 훅 추출 (영향도 높음, 노력 중간)
-1. `useFormSubmit` 훅 (예상: 4시간)
-2. `useFetchData` 훅 (예상: 3시간)
+1. `useFormSubmit` 훅
+2. `useFetchData` 훅
 
 ### Phase 3: 컴포넌트 추상화 (영향도 중간, 노력 높음)
-1. `DataTable` 컴포넌트 (예상: 1일)
-2. `FilterPanel` 컴포넌트 (예상: 1일)
+1. `DataTable` 컴포넌트
+2. `FilterPanel` 컴포넌트
 
 ## 하지 말아야 할 것
 - 2회만 반복되는 패턴 추상화 (Rule of Three)

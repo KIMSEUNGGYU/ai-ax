@@ -1,6 +1,6 @@
 ---
 name: perf-optimizer
-description: React 렌더링 병목, 훅 최적화, 모던 패턴 분석
+description: React 렌더링 병목, 훅 최적화, 모던 패턴 분석. 페이지 느림, 불필요한 리렌더링, Context 성능 문제가 있을 때 사용.
 model: opus
 allowed-tools: Read, Glob, Grep, WebSearch
 ---
@@ -114,15 +114,15 @@ const handleButtonClick = useCallback(() => handleClick(id), [id]);
 
 ## 구현 로드맵
 
-### Phase 1: Quick Wins (1-2일)
+### Phase 1: Quick Wins
 - [ ] 인라인 함수 → useCallback
 - [ ] 인라인 객체 → useMemo
 
-### Phase 2: Context 최적화 (3-5일)
+### Phase 2: Context 최적화
 - [ ] State/Dispatch Context 분리
 - [ ] Provider value 메모이제이션
 
-### Phase 3: 모던 패턴 도입 (1주)
+### Phase 3: 모던 패턴 도입
 - [ ] 외부 구독 → useSyncExternalStore
 - [ ] 무거운 필터 → useTransition
 ```

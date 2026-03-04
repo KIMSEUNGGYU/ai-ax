@@ -370,6 +370,44 @@ API 관련 코드 작성 시 아래 순서로 정의한다.
 
 ---
 
+## 6. 고급 패턴
+
+### Prefetch
+
+리스트 → 상세 전환 시 prefetch로 로딩 없는 전환:
+
+```typescript
+// 상세 페이지 진입 전 prefetch (리스트 페이지에서)
+const handleRowClick = (merchantId: string) => {
+  queryClient.prefetchQuery(merchantQuery.detail(merchantId));
+  router.push(`/merchants/${merchantId}`);
+};
+```
+
+### Optimistic Update (선택적)
+
+즉각 UI 반영이 필요한 경우에만 사용:
+
+```typescript
+mutationOptions({
+  mutationFn: updateTodo,
+  onMutate: async (newTodo) => {
+    await queryClient.cancelQueries({ queryKey: todoKeys.all });
+    const previous = queryClient.getQueryData(todoKeys.detail(newTodo.id));
+    queryClient.setQueryData(todoKeys.detail(newTodo.id), newTodo);
+    return { previous };
+  },
+  onError: (_, __, context) => {
+    queryClient.setQueryData(todoKeys.detail(newTodo.id), context?.previous);
+  },
+  onSettled: () => {
+    queryClient.invalidateQueries({ queryKey: todoKeys.all });
+  },
+});
+```
+
+---
+
 ## ✅ DO & ❌ DON'T
 
 ### ✅ DO
@@ -392,10 +430,10 @@ API 관련 코드 작성 시 아래 순서로 정의한다.
 
 ---
 
-## 버전 히스토리
+## 변경 히스토리
 
-| 버전 | 날짜 | 변경사항 |
-|------|------|----------|
-| 1.0.0 | 2025-02-05 | API/타입 계층 컨벤션 초안 |
-| 2.0.0 | 2026-02-08 | HttpClient 래퍼, staleTime, normalizeFilters, Suspense 추가 |
-| 2.1.0 | 2026-02-08 | 톤 정리 — 폴더 구조 중복 제거, HttpClient 구현→규칙 축소, VO/SSR 제거, SearchParamsBuilder 추가, mutations 실제 패턴 반영 |
+| 날짜 | 변경사항 |
+|------|----------|
+| 2025-02-05 | 초안 |
+| 2026-02-08 | HttpClient 래퍼, staleTime, normalizeFilters, Suspense 추가 |
+| 2026-02-08 | 톤 정리 — 폴더 구조 중복 제거, HttpClient 구현→규칙 축소, VO/SSR 제거, SearchParamsBuilder 추가, mutations 실제 패턴 반영 |

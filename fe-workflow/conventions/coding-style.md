@@ -148,6 +148,93 @@ const [contentStatus, setContentStatus] = useState(ContentStatus.기본);
 {!소재보류 && !소재수정 && (...)}
 ```
 
+## Modal / Dialog
+
+`overlay-kit`의 `overlay.open` 패턴을 사용한다. 컴포넌트 상태(`useState`)로 모달을 제어하지 않는다:
+
+```tsx
+import { overlay } from 'overlay-kit';
+import { AlertDialog } from 'components/Dialog';
+
+// ✅ overlay.open 패턴
+const handleDeleteClick = () => {
+  overlay.open(({ isOpen, close }) => (
+    <AlertDialog
+      isOpen={isOpen}
+      close={close}
+      title="삭제할까요?"
+      description="삭제 후 복구할 수 없어요."
+      onConfirm={async () => {
+        await deleteMutation.mutateAsync(params);
+        close();
+      }}
+    />
+  ));
+};
+
+// ❌ useState로 모달 제어
+const [isDialogOpen, setIsDialogOpen] = useState(false);
+<Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)} />
+```
+
+공용 `AlertDialog` (`components/Dialog.tsx`)를 우선 사용하고, 커스텀 모달이 필요한 경우에만 TDS `AlertDialog`를 직접 사용한다.
+
+## useEffect 기명 함수
+
+useEffect 콜백에는 기명 함수를 사용한다. 목적이 코드에 드러나야 한다:
+
+```tsx
+// ✅ 기명 함수 — 목적이 코드에 드러남
+useEffect(function syncFormWithQuery() {
+  form.reset(data);
+}, [data]);
+
+// ❌ 익명 함수 — 목적 파악에 코드 전체를 읽어야 함
+useEffect(() => {
+  form.reset(data);
+}, [data]);
+```
+
+## Form 패턴 (react-hook-form)
+
+useForm + handleSubmit + mutateAsync 조합을 사용한다:
+
+```tsx
+// ✅ useForm + handleSubmit + mutateAsync
+const form = useForm<FormData>({
+  resolver: zodResolver(schema),
+  defaultValues: { name: '' },
+});
+
+const handleFormSubmit = form.handleSubmit(async (data) => {
+  try {
+    await createMutation.mutateAsync(data);
+    showSuccessToast('등록 완료');
+  } catch (error) {
+    showApiErrorToast(error);
+  }
+});
+
+// ❌ onSubmit에서 form.getValues() 사용
+const handleSubmit = () => {
+  const data = form.getValues();
+  createMutation.mutate(data);
+};
+```
+
+## TypeScript Enum 금지
+
+enum은 트리셰이킹이 불가능하고 런타임 코드를 생성한다. `as const` 객체 또는 union type을 사용한다:
+
+```typescript
+// ❌ enum — 트리셰이킹 불가, 런타임 코드 생성
+enum Status { Active = 'active', Inactive = 'inactive' }
+
+// ✅ as const 객체 또는 union type
+const Status = { Active: 'active', Inactive: 'inactive' } as const;
+type Status = (typeof Status)[keyof typeof Status];
+```
+
 ## Console.log
 
 - No `console.log` statements in production code

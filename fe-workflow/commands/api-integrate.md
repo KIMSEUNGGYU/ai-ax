@@ -130,13 +130,14 @@ export const create{Resource} = async (params: Create{Resource}Params) => {
 };
 
 // PUT
-export const update{Resource} = async (id: number, params: Update{Resource}Params) => {
-  return httpClient.put(`{api-path}/${id}`, { json: params });
+export const update{Resource} = async (params: Update{Resource}Params) => {
+  const { id, ...payload } = params;
+  return httpClient.put(`{api-path}/${id}`, { json: payload });
 };
 
 // DELETE
-export const delete{Resource} = async (id: number) => {
-  return httpClient.delete(`{api-path}/${id}`);
+export const delete{Resource} = async (params: Delete{Resource}Params) => {
+  return httpClient.delete(`{api-path}/${params.id}`);
 };
 ```
 
@@ -177,8 +178,7 @@ export const {resource}Mutations = {
 
   update: () =>
     mutationOptions({
-      mutationFn: ({ id, params }: { id: number; params: Update{Resource}Params }) =>
-        update{Resource}(id, params),
+      mutationFn: (params: Update{Resource}Params) => update{Resource}(params),
       onSuccess: () => {
         queryClient.invalidateQueries({
           queryKey: {resource}Keys.all,
@@ -188,7 +188,7 @@ export const {resource}Mutations = {
 
   delete: () =>
     mutationOptions({
-      mutationFn: (id: number) => delete{Resource}(id),
+      mutationFn: (params: Delete{Resource}Params) => delete{Resource}(params),
       onSuccess: () => {
         queryClient.invalidateQueries({
           queryKey: {resource}Keys.all,

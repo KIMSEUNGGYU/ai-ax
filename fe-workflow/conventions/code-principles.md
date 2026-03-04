@@ -473,11 +473,36 @@ await mutateAsync({
 > **판단 기준:** 추출했을 때 (1) 재사용되거나 (2) 복잡한 로직이 추상화되어 읽기 쉬워지는 경우에만 추출한다.
 > 단순히 "분리"만 하는 추출은 오히려 시점 이동(indirection)으로 가독성을 해친다.
 
+```tsx
+// ❌ mutation + overlay 로직을 커스텀 훅으로 추출
+// 훅 안에서 JSX(AlertDialog)를 렌더링 → 로직과 UI가 훅에 숨겨짐
+// 수정하려면 훅 파일을 열어야 하고, 컴포넌트에서 동작이 안 보임
+function useUrgentToggle(orderNo: string) {
+  const mutation = useMutation(funnelDetailMutations.urgent());
+  const handleToggle = async (isUrgent: boolean) => {
+    if (isUrgent) { /* OFF 처리 */ return; }
+    overlay.open(({ isOpen, close }) => (
+      <AlertDialog onConfirm={async () => { await mutation.mutateAsync(...); close(); }} />
+    ));
+  };
+  return { handleUrgentToggle: handleToggle };
+}
+
+// ✅ 컴포넌트에 인라인 — mutation + 핸들러 + overlay가 사용처에서 바로 보임
+// 1회 사용이고, 컴포넌트의 UI 흐름 안에서 읽히는 게 더 명확
+function OrderTabContent({ orderNo, item }: Props) {
+  const urgentMutation = useMutation(funnelDetailMutations.urgent());
+  const handleUrgentToggle = async () => { /* 바로 여기서 처리 */ };
+  return <Table.Toggle onChange={handleUrgentToggle} />;
+}
+```
+
 ---
 
-## 버전 히스토리
+## 변경 히스토리
 
-| 버전 | 날짜 | 변경사항 |
-|------|------|----------|
-| 0.1.0 | 2026-02-08 | 코드 원칙 컨벤션 초판 (best-code 소스 기반) |
-| 0.2.0 | 2026-02-27 | 이른 추상화 구체적 안티패턴 4가지 추가 (ISH-1229 리뷰 학습) |
+| 날짜 | 변경사항 |
+|------|----------|
+| 2026-02-08 | 초판 (best-code 소스 기반) |
+| 2026-02-27 | 이른 추상화 구체적 안티패턴 4가지 추가 (ISH-1229 리뷰 학습) |
+| 2026-03-04 | mutation+overlay 훅 추출 안티패턴 추가 (ISH-1261 리뷰 학습) |

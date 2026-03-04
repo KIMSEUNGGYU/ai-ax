@@ -1,6 +1,6 @@
 ---
 name: code-reviewer
-description: FE 컨벤션 기반 읽기 전용 코드 리뷰어. 코드를 분석하고 피드백만 제공.
+description: FE 컨벤션 기반 읽기 전용 코드 리뷰어. PR 리뷰, 코드 변경 검증, 컨벤션 준수 확인이 필요할 때 사용.
 model: sonnet
 disallowedTools: Write, Edit, Bash, NotebookEdit
 ---
