@@ -30,6 +30,8 @@ description: Use when writing, reviewing, or refactoring frontend code. Triggers
 - useEffect 익명 함수
 - 명령형 로딩/에러 분기 (`if (isLoading)`)
 - instanceof 에러 판별
+- A-B-A-B 분산 — 관련 로직(상태+핸들러, 조회+가공)이 떨어져 있으면 즉시 모아두기
+- 분리만 한 훅 — 사용처에서 return 값 5개 이상이면 추상화 실패 의심. 사용처도 내부도 깔끔해져야 진짜 추상화
 
 ## 폴더 구조
 

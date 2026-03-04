@@ -261,7 +261,7 @@ type TidRegistrationForm =
 // ── 공통 ──
 type MerchantStatus = 'active' | 'inactive';
 
-// ── GET /merchants (리스트) ──
+// ── GET /merchants (리스트) — .ai/specs/api/merchant.md ──
 interface FetchMerchantListParams extends CursorPaginationParams {
   filters: MerchantFilters;
 }
@@ -276,7 +276,7 @@ interface MerchantListResponse extends CursorPaginationResponse<MerchantListItem
   totalCount: number;
 }
 
-// ── GET /merchants/:id (상세) ──
+// ── GET /merchants/:id (상세) — .ai/specs/api/merchant.md ──
 interface FetchMerchantDetailParams {
   merchantId: string;
 }
@@ -288,13 +288,13 @@ interface MerchantDetail {
   van: Van;
 }
 
-// ── POST /merchants (생성) ──
+// ── POST /merchants (생성) — .ai/specs/api/merchant.md ──
 interface CreateMerchantParams {
   name: string;
   businessNumber: string;
 }
 
-// ── PUT /merchants/:id (수정) ──
+// ── PUT /merchants/:id (수정) — .ai/specs/api/merchant.md ──
 interface UpdateMerchantParams {
   merchantId: string;
   name?: string;
@@ -356,11 +356,40 @@ type MerchantListItem = Pick<MerchantDetail, 'id' | 'name' | 'van'>;
 
 ---
 
-## 5. 개발 순서
+## 5. API 스펙 문서 (.ai/specs/api/)
+
+> API 정의/사용 시 반드시 `.ai/specs/api/` 문서를 먼저 확인하고, 없으면 생성한다.
+
+### 워크플로우
+
+```
+1. .ai/specs/api/{domain}.md 확인 → 해당 엔드포인트 있는지 탐색
+2. 없으면 → 백엔드 확인 후 .ai/specs/api/{domain}.md에 추가
+3. 스펙 문서 기반으로 DTO/Remote/Mutation 작성
+```
+
+### DTO 주석 규칙
+
+DTO 파일에서 각 엔드포인트 그룹 주석에 **API 스펙 문서 경로**를 포함한다.
+
+```typescript
+// models/merchant.dto.ts
+
+// ── GET /merchants (리스트) — .ai/specs/api/merchant.md ──
+interface FetchMerchantListParams { ... }
+
+// ── PATCH /merchants/:id (수정) — .ai/specs/api/merchant.md ──
+interface UpdateMerchantParams { ... }
+```
+
+---
+
+## 6. 개발 순서
 
 API 관련 코드 작성 시 아래 순서로 정의한다.
 
 ```
+0. .ai/specs/api/ → API 스펙 확인 (없으면 생성)
 1. models/   → DTO 타입 정의 (Request/Response)
 2. remotes/  → API 함수 정의 (httpClient 사용)
 3. queries/  → queryOptions 정의 (조회)

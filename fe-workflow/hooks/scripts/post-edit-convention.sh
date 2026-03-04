@@ -11,7 +11,7 @@ if [ "$TOOL_NAME" = "Edit" ] || [ "$TOOL_NAME" = "Write" ]; then
     cat << 'EOF'
 {
   "hookSpecificOutput": {
-    "additionalContext": "✅ 컴포넌트 컨벤션 체크\n- useEffect 기명함수?\n- useSuspenseQuery 기본 (if isLoading 금지)?\n- mutateAsync + try-catch?\n- ErrorBoundary/Suspense로 감쌌는가?"
+    "additionalContext": "✅ 컴포넌트 컨벤션 체크\n- useEffect 기명함수?\n- useSuspenseQuery 기본 (if isLoading 금지)?\n- mutateAsync + try-catch?\n- ErrorBoundary/Suspense로 감쌌는가?\n- 관련 로직이 A-B-A-B로 분산되어 있지 않은가?\n- 커스텀 훅 추출이 진짜 추상화인가? (사용처+내부 모두 깔끔해지는가?)"
   }
 }
 EOF

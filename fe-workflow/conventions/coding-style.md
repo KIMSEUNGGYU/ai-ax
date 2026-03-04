@@ -179,6 +179,49 @@ const [isDialogOpen, setIsDialogOpen] = useState(false);
 
 공용 `AlertDialog` (`components/Dialog.tsx`)를 우선 사용하고, 커스텀 모달이 필요한 경우에만 TDS `AlertDialog`를 직접 사용한다.
 
+## A-B-A-B 분산 금지
+
+관련 로직은 반드시 가까이 배치한다. 상태와 핸들러, 조회와 가공이 떨어져 있으면 즉시 모은다:
+
+```tsx
+// ❌ A-B-A-B — 관련 로직이 분산
+const [month, setMonth] = useState(new Date());     // A: 월 선택
+const { data } = useSuspenseQuery(query.list(month)); // B: 데이터 조회
+const goPrevMonth = () => setMonth(prev => subMonths(prev, 1)); // A: 월 선택
+const filteredData = data.filter(d => d.active);     // B: 데이터 가공
+
+// ✅ 관련된 것끼리 묶음 — 컴포넌트로 추상화
+<MonthSelector value={month} onChange={setMonth} />
+<ConsumptionList month={month} />  // 내부에서 조회+가공 처리
+```
+
+**감지 기준:** 같은 상태/데이터를 다루는 코드가 다른 관심사 코드 사이에 끼어 있으면 A-B-A-B다.
+
+## 분리 ≠ 추상화
+
+커스텀 훅으로 추출했다고 추상화가 아니다. **사용처도 내부도 깔끔해져야** 진짜 추상화:
+
+```tsx
+// ❌ 분리만 한 훅 — return 값이 5개 이상이면 추상화 실패 의심
+function useConsumptionPage() {
+  const [month, setMonth] = useState();
+  const { data, isError, refetch } = useQuery(...);
+  const goPrevMonth = () => {};
+  const goNextMonth = () => {};
+  return { month, data, isError, refetch, goPrevMonth, goNextMonth };
+}
+// 접어놓고 "깔끔하다" → 수정하려면 훅 열어야 함
+
+// ✅ 진짜 추상화 — 사용처가 HTML처럼 읽힘
+<MonthSelector value={month} onChange={setMonth} />
+const { data } = useSuspenseQuery(consumptionQuery.list(month));
+```
+
+**자가 진단:**
+1. 훅의 return 값이 5개 이상인가? → 책임 과다, 분리 실패
+2. 사용처에서 훅 내부를 알아야 쓸 수 있는가? → 추상화 실패
+3. 훅을 제거하고 인라인으로 풀면 오히려 읽기 쉬운가? → 불필요한 분리
+
 ## useEffect 기명 함수
 
 useEffect 콜백에는 기명 함수를 사용한다. 목적이 코드에 드러나야 한다:
