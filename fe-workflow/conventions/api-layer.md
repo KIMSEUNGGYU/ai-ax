@@ -261,42 +261,55 @@ type TidRegistrationForm =
 // ── 공통 ──
 type MerchantStatus = 'active' | 'inactive';
 
-// ── GET /merchants (리스트) — .ai/specs/api/merchant.md ──
+// ── GET /merchants (리스트) ──
 interface FetchMerchantListParams extends CursorPaginationParams {
   filters: MerchantFilters;
 }
 
 interface MerchantListItem {
+  /** 가맹점 ID */
   id: number;
+  /** 가맹점명 */
   name: string;
+  /** 가맹점 상태 */
   status: MerchantStatus;
 }
 
 interface MerchantListResponse extends CursorPaginationResponse<MerchantListItem> {
+  /** 전체 가맹점 수 */
   totalCount: number;
 }
 
-// ── GET /merchants/:id (상세) — .ai/specs/api/merchant.md ──
+// ── GET /merchants/:id (상세) ──
 interface FetchMerchantDetailParams {
+  /** 가맹점 ID */
   merchantId: string;
 }
 
 interface MerchantDetail {
+  /** 가맹점 ID */
   id: number;
+  /** 가맹점명 */
   name: string;
+  /** 사업자번호 (10자리) */
   businessNumber: string;
+  /** VAN사 */
   van: Van;
 }
 
-// ── POST /merchants (생성) — .ai/specs/api/merchant.md ──
+// ── POST /merchants (생성) ──
 interface CreateMerchantParams {
+  /** 가맹점명 */
   name: string;
+  /** 사업자번호 (10자리) */
   businessNumber: string;
 }
 
-// ── PUT /merchants/:id (수정) — .ai/specs/api/merchant.md ──
+// ── PUT /merchants/:id (수정) ──
 interface UpdateMerchantParams {
+  /** 가맹점 ID */
   merchantId: string;
+  /** 가맹점명 */
   name?: string;
 }
 ```
@@ -370,17 +383,44 @@ type MerchantListItem = Pick<MerchantDetail, 'id' | 'name' | 'van'>;
 
 ### DTO 주석 규칙
 
-DTO 파일에서 각 엔드포인트 그룹 주석에 **API 스펙 문서 경로**를 포함한다.
+DTO 속성에 **한글 JSDoc 주석**을 달아 필드의 의미를 명시한다. 백엔드 응답/요청의 필드명만으로 의미 파악이 어려운 경우가 많으므로, 각 속성에 `/** 설명 */` 주석을 추가한다.
 
 ```typescript
-// models/merchant.dto.ts
+// models/funnel.dto.ts
 
-// ── GET /merchants (리스트) — .ai/specs/api/merchant.md ──
-interface FetchMerchantListParams { ... }
-
-// ── PATCH /merchants/:id (수정) — .ai/specs/api/merchant.md ──
-interface UpdateMerchantParams { ... }
+// ── GET /funnels/:id (상세) ──
+interface FunnelOrderDetail {
+  /** 주문 ID */
+  orderId: number;
+  /** 주문시각 */
+  orderTs: string;
+  /** 긴급 여부 */
+  isUrgent: boolean;
+  /** 구매 출처 */
+  source: string;
+  /** 주문번호 */
+  orderNo: string;
+  /** 주문자 이름 (마스킹) */
+  ordererName: string;
+  /** 주문자 전화번호 (마스킹) */
+  ordererPhone: string;
+  /** 구매 유형 (e.g. '온라인') */
+  purchaseType?: string;
+  /** 주문 상태 */
+  status: string[];
+  /** 제휴사 정보 (e.g. ['배달의민족']) */
+  partners?: string[];
+  /** 설치일 (e.g. '2021-01-15') */
+  installDate?: string;
+}
 ```
+
+**규칙:**
+- 모든 DTO 속성에 `/** */` JSDoc 주석 추가
+- `id`, `name` 등 자명한 필드도 도메인 맥락 설명 (e.g. `/** 주문 ID */`)
+- 값 형식이 특수하면 예시 포함 (e.g. `(e.g. '2021-01-15')`)
+- 마스킹/가공 여부 명시 (e.g. `(마스킹)`)
+- 엔드포인트 그룹 주석은 `// ── METHOD /path (설명) ──` 형식
 
 ---
 

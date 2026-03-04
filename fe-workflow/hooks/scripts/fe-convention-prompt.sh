@@ -3,7 +3,7 @@
 
 echo '🏗️ FE 컨벤션 적용 필수
 [API 스펙] API 정의/사용 시 .ai/specs/api/{domain}.md 먼저 확인 → 없으면 생성
-[DTO 주석] 엔드포인트 그룹 주석에 스펙 문서 경로 포함 (// ── METHOD /path — .ai/specs/api/domain.md ──)
+[DTO 주석] 모든 속성에 /** 한글 설명 */ JSDoc 주석 필수
 [타입] 객체=interface, 단일/유니온/유틸리티=type, *Params 네이밍
 [Remote] params 항상 객체, httpClient만, DTO 도메인별 단일 파일
 [Mutation] onSuccess에서 invalidateQueries, mutateAsync+try-catch

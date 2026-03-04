@@ -22,7 +22,7 @@ EOF
     cat << 'EOF'
 {
   "hookSpecificOutput": {
-    "additionalContext": "✅ API 레이어 컨벤션 체크\n- type → interface?\n- 파라미터 *Params 객체 타입?\n- DTO 도메인별 단일 파일?\n- mutation: onSuccess에서 invalidateQueries?\n- query: staleTime 설정?"
+    "additionalContext": "✅ API 레이어 컨벤션 체크\n- type → interface?\n- 파라미터 *Params 객체 타입?\n- DTO 도메인별 단일 파일?\n- DTO 속성에 /** 한글 설명 */ JSDoc 주석?\n- mutation: onSuccess에서 invalidateQueries?\n"
   }
 }
 EOF
