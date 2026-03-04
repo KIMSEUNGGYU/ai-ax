@@ -230,5 +230,3 @@ pages/{도메인}/list/
 | sshh.io | Document & Clear, /catchup |
 | Claude Code 공식 | MD 계층 로드, auto memory 200줄, rules/ 모듈 |
 | OpenAI Codex | AGENTS.md, Progressive Disclosure, Skills |
-
-<!-- last-active: 2026-03-03 22:50 -->
