@@ -13,11 +13,13 @@ argument-hint: [작업 파일명 (선택)]
 `.ai/archive/{서비스}/`에 경량 기록: `# 제목` + 완료일/구현/결정 각 한 줄
 
 ## 3. 자가학습 (필수 — 스킵 시 반드시 사유 출력)
-active 파일에 `## 세션 이력`과 session_id가 있을 때만 실행.
+항상 실행. transcript 결정 우선순위:
+1. active 파일에 `## 세션 이력`의 session_id → 해당 transcript 사용
+2. 세션 이력 없으면 → 가장 최근 수정된 transcript (현재 세션) 사용: `ls -t ~/.claude/projects/{project-hash}/*.jsonl | head -1`
 
 **3-1.** transcript 전처리:
 ```bash
-node "${CLAUDE_PLUGIN_ROOT}/scripts/extract-corrections.mjs" ~/.claude/projects/{project-hash}/{session_id}.jsonl
+node "${CLAUDE_PLUGIN_ROOT}/scripts/extract-corrections.mjs" {transcript_path1} [{transcript_path2} ...]
 ```
 `{project-hash}`: cwd를 `-`로 변환. 출력: `{ messages, stats: { correctionHits, extracted } }`
 
@@ -40,7 +42,7 @@ node "${CLAUDE_PLUGIN_ROOT}/scripts/extract-corrections.mjs" ~/.claude/projects/
 작업 완료: {제목}
 → archive: .ai/archive/{경로}
 → 자가학습: {N}건 반영 / 스킵({사유}) / 교정 없음
-  사유 예시: "세션 이력 없음", "correctionHits=0", "extracted<3", "사용자 스킵"
+  스킵 사유 예시: "correctionHits=0", "extracted<3", "사용자 스킵"
 → 패턴 저장: {경로} / 없음
 → active 삭제 완료
 ```
