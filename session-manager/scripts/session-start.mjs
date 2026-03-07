@@ -2,11 +2,11 @@
  * SessionStart Hook: 세션 시작 시 .ai/INDEX.md + active/ 컨텍스트 주입
  *
  * 1. .ai/INDEX.md 존재하면 additionalContext로 주입
- * 2. .ai/active/ 파일 1개 → 내용 자동 주입 (auto-resume) + session_id 등록
+ * 2. .ai/active/ 파일 1개 → 내용 자동 주입 (auto-resume)
  * 3. .ai/active/ 파일 2개+ → 목록만 표시 + /resume 안내
  */
 
-import { readFile, readdir, appendFile, writeFile } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
 import { join } from 'node:path';
 
 const projectRoot = process.cwd();
@@ -66,11 +66,6 @@ if (activeFiles.length === 1) {
     const content = await readFile(filePath, 'utf-8');
     contextParts.push(`[session-manager] 현재 작업 (${taskName}):\n${content}`);
     messageParts.push(`[session-manager] 작업 자동 복원: ${taskName}`);
-
-    // session_id 자동 등록
-    if (sessionId) {
-      await appendSessionId(filePath, sessionId, timestamp);
-    }
   } catch {
     messageParts.push(`[session-manager] 작업 파일 읽기 실패: ${taskName}`);
   }
@@ -79,6 +74,11 @@ if (activeFiles.length === 1) {
   messageParts.push(`[session-manager] 진행 중 작업 ${activeFiles.length}개:\n${list}\n→ /resume 으로 작업을 선택하세요.`);
 } else {
   messageParts.push('[session-manager] 활성 작업 없음 — 새 세션');
+}
+
+// session_id를 context에 주입 → /save 시 Claude가 세션 이력에 기록
+if (sessionId) {
+  contextParts.push(`[session-manager] session_id: ${sessionId}`);
 }
 
 if (contextParts.length > 0) {
@@ -96,24 +96,3 @@ if (messageParts.length > 0) {
 
 console.log(JSON.stringify(result));
 
-// --- helpers ---
-
-async function appendSessionId(filePath, sid, ts) {
-  const content = await readFile(filePath, 'utf-8');
-  const marker = '## 세션 이력';
-
-  if (content.includes(sid)) return; // 이미 등록됨
-
-  const entry = `- ${sid} (${ts})`;
-
-  if (content.includes(marker)) {
-    // 세션 이력 섹션 헤더 바로 다음에 삽입 (다른 섹션 앞)
-    const markerIndex = content.indexOf(marker);
-    const afterMarker = markerIndex + marker.length;
-    const newContent = content.slice(0, afterMarker) + `\n${entry}` + content.slice(afterMarker);
-    await writeFile(filePath, newContent, 'utf-8');
-  } else {
-    // 세션 이력 섹션 새로 생성 (파일 끝)
-    await appendFile(filePath, `\n${marker}\n${entry}\n`);
-  }
-}

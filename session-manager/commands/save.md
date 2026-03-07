@@ -53,7 +53,14 @@ $ARGUMENTS
 - 결정사항 (새 결정 추가)
 - 메모 (블로커/주의사항 갱신)
 
-### 5. INDEX.md 동기화
+### 5. 세션 이력 기록
+- 대화 컨텍스트에서 `[session-manager] session_id: {id}` 를 찾는다
+- session_id가 있으면 → 작업 파일 끝의 `## 세션 이력` 섹션에 `- {session_id} ({timestamp})` 추가
+- `## 세션 이력` 섹션이 없으면 → 파일 끝에 섹션 생성
+- 이미 같은 session_id가 기록되어 있으면 → 건너뛴다
+- timestamp 형식: `YYYY-MM-DD HH:MM` (현재 시각)
+
+### 6. INDEX.md 동기화
 - `.ai/INDEX.md`가 있으면 → "현재 진행 중" 섹션에 해당 작업 링크 추가/업데이트
 - 없으면 → 생략 (INDEX.md는 별도 생성)
 
