@@ -412,6 +412,75 @@ function FormField({ value, onChange }: Props) {
 
 ---
 
+## 9. 타입 설계와 분기 전략
+
+> 서버 string을 FE에서 다룰 때: 관계 기반 타입 정의 + 기획 구조에 맞는 분기.
+
+### 타입 추출 규칙
+
+- 같은 리터럴 유니온이 **2곳 이상** → `type`으로 추출
+- 소스 데이터가 한글이면 union 값도 **한글 유지** (불필요한 영어 번역 금지)
+- 서버 DTO(`models/`)에는 서버 타입만, FE 분류 타입은 **사용하는 파일에 정의**
+
+```typescript
+// ❌ 같은 리터럴 유니온을 여러 곳에서 반복
+inspectionType?: '완료' | '반려';  // dto
+inspectionType: '완료' | '반려';   // mutation params
+Record<'완료' | '반려', 'green' | 'red'>  // component
+
+// ✅ 타입 한 곳에서 정의, import해서 사용
+export type InspectionType = '완료' | '반려';
+```
+
+### 서버 string → FE 분류 타입
+
+서버가 `string`으로 내려주지만 FE에서 케이스별 분기가 필요할 때 → **변환 함수 한 곳에서 관리**
+
+```typescript
+// 페이지 파일 하단에 정의 (고수준 → 저수준 배치)
+type AttachmentType = '수기 업로드' | '대표자 신분증' | '일반';
+
+function getAttachmentType(labelName: string): AttachmentType {
+  if (labelName === '수기 업로드') return '수기 업로드';
+  if (labelName === '대표자 신분증') return '대표자 신분증';
+  return '일반';
+}
+```
+
+- 함수명: `get*` (분류/판별) — `to*`는 데이터 변환에만 사용
+- 새 케이스 추가 시 이 함수 하나만 수정
+
+### 배타적 분기: match + exhaustive
+
+기획에서 케이스별로 **보여주는 것이 다를 때** → `match().exhaustive()`로 선언
+
+```typescript
+// ❌ 절차적 조건문 — 케이스 간 관계가 안 보임
+const isManualUpload = current.labelName === '수기 업로드';
+const isIdDocument = current.labelName === '대표자 신분증';
+{isIdDocument ? <OcrInfoTable /> : null}
+{!isManualUpload ? <InspectionRadio /> : null}
+
+// ✅ 배타적 케이스를 match로 선언 — 기획 구조가 코드에 보임
+{match(attachmentType)
+  .with('수기 업로드', () => null)
+  .with('대표자 신분증', () => (
+    <>
+      <OcrInfoTable />
+      <InspectionRadio />
+    </>
+  ))
+  .with('일반', () => <InspectionRadio />)
+  .exhaustive()}
+```
+
+**판단 기준:**
+- **배타적 분기** (A or B or C, 각각 보여주는 게 다름) → `match`
+- **레이어 조합** (공통 기반 + 옵션 추가/제거) → 조건부 렌더링
+- 기획이 "A는 X+Y, B는 X만"이면 → **컴포넌트 중복이 맞음** (X를 추출하려 하지 않음)
+
+---
+
 ## ✅ DO & ❌ DON'T
 
 ### ✅ DO
@@ -514,3 +583,4 @@ function OrderTabContent({ orderNo, item }: Props) {
 | 2026-02-08 | 초판 (best-code 소스 기반) |
 | 2026-02-27 | 이른 추상화 구체적 안티패턴 4가지 추가 (ISH-1229 리뷰 학습) |
 | 2026-03-04 | mutation+overlay 훅 추출 안티패턴 추가 (ISH-1261 리뷰 학습) |
+| 2026-03-07 | §9 타입 설계와 분기 전략 추가 — 리터럴 union 추출, 서버 string→FE 분류, match vs 조건부 렌더링 판단 기준 (ISH-1266 리뷰 학습) |
