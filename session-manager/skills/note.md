@@ -1,5 +1,6 @@
 ---
-description: "정리해줘", "남겨둬", "노트로 만들어줘" 등 자연어로 지식 저장 트리거
+name: note
+description: Use when the user asks to save, organize, or record knowledge from the current session — triggered by phrases like "정리해줘", "남겨둬", "노트로 만들어줘", "기록해줘", "패턴으로 저장해줘"
 ---
 
 사용자가 세션 대화 중 정리/저장을 자연어로 요청할 때 트리거된다.

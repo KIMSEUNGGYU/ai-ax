@@ -12,7 +12,7 @@ argument-hint: [정리할 내용 (선택)]
 |----------|----------|------|
 | 프로젝트 설계/분석/결정 | `.ai/notes/{topic}.md` | API 구조 분석, 아키텍처 결정, 라이브러리 비교 |
 | 재사용 코드 패턴 | `.ai/patterns/{pattern-name}.md` | 커스텀 훅 패턴, 에러 처리 패턴, 폴더 구조 |
-| 개인 학습 (TIL, 개념, 트러블슈팅) | `~/obsidian-note/00_Inbox/{title}.md` | React 렌더링 이해, Git rebase 정리 |
+| 개인 학습 (TIL, 개념, 트러블슈팅) | `~/hq/00_Inbox/{title}.md` | React 렌더링 이해, Git rebase 정리 |
 
 ## 동작
 
@@ -72,7 +72,7 @@ argument-hint: [정리할 내용 (선택)]
 {실제 사용 예}
 ```
 
-### ~/obsidian-note/ 포맷
+### ~/hq/ 포맷
 - 기존 옵시디언 노트 스타일을 따름
 - `00_Inbox`에 저장하여 나중에 정리
 

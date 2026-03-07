@@ -6,7 +6,7 @@
  * 3. .ai/active/ 파일 2개+ → 목록만 표시 + /resume 안내
  */
 
-import { readFile, readdir, appendFile } from 'node:fs/promises';
+import { readFile, readdir, appendFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 const projectRoot = process.cwd();
@@ -106,10 +106,13 @@ async function appendSessionId(filePath, sid, ts) {
   const entry = `- ${sid} (${ts})`;
 
   if (content.includes(marker)) {
-    // 기존 세션 이력 섹션에 추가
-    await appendFile(filePath, `${entry}\n`);
+    // 세션 이력 섹션 헤더 바로 다음에 삽입 (다른 섹션 앞)
+    const markerIndex = content.indexOf(marker);
+    const afterMarker = markerIndex + marker.length;
+    const newContent = content.slice(0, afterMarker) + `\n${entry}` + content.slice(afterMarker);
+    await writeFile(filePath, newContent, 'utf-8');
   } else {
-    // 세션 이력 섹션 새로 생성
+    // 세션 이력 섹션 새로 생성 (파일 끝)
     await appendFile(filePath, `\n${marker}\n${entry}\n`);
   }
 }
