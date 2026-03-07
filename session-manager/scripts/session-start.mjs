@@ -28,12 +28,6 @@ try {
 const sessionId = hookInput.session_id || '';
 const timestamp = new Date().toISOString().slice(0, 16).replace('T', ' ');
 
-// DEBUG: stdin 데이터 덤프 (확인 후 삭제)
-try {
-  await writeFile('/tmp/session-start-debug.json', JSON.stringify({ hookInput, sessionId, keys: Object.keys(hookInput), cwd: projectRoot, pluginRoot: process.env.CLAUDE_PLUGIN_ROOT || 'N/A' }, null, 2), 'utf-8');
-} catch (e) {
-  await writeFile('/tmp/session-start-error.txt', String(e), 'utf-8').catch(() => {});
-}
 
 let indexContent = '';
 let activeFiles = [];
