@@ -28,6 +28,9 @@ try {
 const sessionId = hookInput.session_id || '';
 const timestamp = new Date().toISOString().slice(0, 16).replace('T', ' ');
 
+// DEBUG: stdin 데이터 덤프 (확인 후 삭제)
+await writeFile('/tmp/session-start-debug.json', JSON.stringify({ hookInput, sessionId, keys: Object.keys(hookInput) }, null, 2), 'utf-8');
+
 let indexContent = '';
 let activeFiles = [];
 // INDEX.md 읽기
