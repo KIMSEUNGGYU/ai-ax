@@ -1,6 +1,5 @@
 ---
-name: fe-spec
-description: 페이지/기능 단위 FE 스펙 문서를 작성한다. "스펙 작성", "spec", "페이지 스펙", "기능 정의", "UI 스펙" 요청에 사용.
+description: 페이지/기능 단위 FE 스펙 문서 작성 — "스펙 작성", "spec", "페이지 스펙", "기능 정의", "UI 스펙" 요청에 사용
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, AskUserQuestion
 argument-hint: <페이지명 또는 기능명>
 ---
